@@ -2,10 +2,11 @@
  * Northeastern University Graduate CS program requirements.
  *
  * Programs covered:
- *  - MS Computer Science (MSCS) — Seattle campus
- *  - MS Artificial Intelligence (MSAI) — Seattle campus
- *  - MS Data Science (MSDS) — Boston campus
+ *  - MS Computer Science (MSCS)
+ *  - MS Artificial Intelligence (MSAI)
+ *  - MS Data Science (MSDS)
  *
+ * Same requirements across all campuses (Boston, Seattle, Silicon Valley, etc.)
  * Based on the 2024-2026 Northeastern Graduate Catalog.
  * https://catalog.northeastern.edu/graduate/computer-information-science/
  */
@@ -19,17 +20,14 @@ import type {
 } from "./types";
 
 // ──────────────────────────────────────────────────────────────────────────────
-// MS Computer Science — Seattle (32 credits, min 3.000 GPA)
+// MS Computer Science (32 credits, min 3.000 GPA)
 // ──────────────────────────────────────────────────────────────────────────────
-// Core: CS 5010 (4cr) + CS 5800 (4cr) = 8 credits required
+// Core: CS 5010 + CS 5011 (4cr) + CS 5800 (4cr) = 8 credits required
 // Breadth: 3 courses from 2 of the 3 breadth areas (12 credits)
-//   NOTE: catalog says "2 of 3 areas", but we model each area with
-//   groupMinCount: 1 for simplicity. This is slightly stricter.
-// Electives: 3 courses (12 credits) from approved list
-// Capstone/Thesis: not explicitly required in coursework list
+// Electives: 3 courses (12 credits) from CS/CY/DS approved list
 
 export const MSCS_REQUIREMENTS: RequirementCourse[] = [
-  // ── Required Core ────────────────────────────────────────────────────────
+  // ── Required Core (8 credits) ───────────────────────────────────────────
   { subject: "CS", courseNumber: "5010", title: "Programming Design Paradigm", credits: 4, category: "Core", required: true },
   { subject: "CS", courseNumber: "5800", title: "Algorithms", credits: 4, category: "Core", required: true },
 
@@ -71,60 +69,66 @@ export const MSCS_ELECTIVE_MIN_NUMBER = 5000;
 export const MSCS_ELECTIVE_MAX_NUMBER = 7999;
 
 // ──────────────────────────────────────────────────────────────────────────────
-// MS Artificial Intelligence — Seattle (32 credits, min 3.000 GPA)
+// MS Artificial Intelligence (32 credits, min 3.000 GPA)
 // ──────────────────────────────────────────────────────────────────────────────
 // Core: 5 required courses (20 credits)
-// Specialization/Electives: 3 courses (12 credits) from specialization areas
-//   5 specialization areas: Vision, Intelligent Interaction, Robotics, ML,
-//   Knowledge Management & Reasoning
-//   Paths: Specialization (2 from 1 area + 1 elective),
-//          Coursework-only (3 from any), or Thesis
+//   CS 5100 required; then 4 with OR options modeled as groups
+// Specialization: 2 courses from one area (8 credits)
+// Path options: Specialization, Thesis, or Coursework-only (4 credits)
 
 export const MSAI_REQUIREMENTS: RequirementCourse[] = [
   // ── Required Core (20 credits) ──────────────────────────────────────────
   { subject: "CS", courseNumber: "5100", title: "Foundations of Artificial Intelligence", credits: 4, category: "Core", required: true },
-  { subject: "CS", courseNumber: "5010", title: "Programming Design Paradigm", credits: 4, category: "Core", required: true },
-  { subject: "CS", courseNumber: "5800", title: "Algorithms", credits: 4, category: "Core", required: true },
-  { subject: "CS", courseNumber: "6140", title: "Machine Learning", credits: 4, category: "Core", required: true },
-  { subject: "CS", courseNumber: "5170", title: "AI for Human-Computer Interaction", credits: 4, category: "Core", required: true },
 
-  // ── Specialization electives (choose ≥3 from any area) ──────────────────
-  // Vision
-  { subject: "CS", courseNumber: "5330", title: "Pattern Recognition and Computer Vision", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "7180", title: "Special Topics in Artificial Intelligence", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  // Intelligent Interaction
-  { subject: "CS", courseNumber: "5150", title: "Game Artificial Intelligence", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "5340", title: "Computer/Human Interaction", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "7340", title: "Theory and Methods in HCI", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  // Robotics and Agent-Based Systems
-  { subject: "CS", courseNumber: "5180", title: "Reinforcement Learning and Sequential Decision Making", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "5335", title: "Robotic Science and Systems", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
+  // Core 2: CS 5130 (Applied Programming for AI)
+  { subject: "CS", courseNumber: "5130", title: "Applied Programming and Data Processing for AI", credits: 4, category: "Core", required: true },
+
+  // Core 3: DADS 5200 or DS 5020 (choose 1)
+  { subject: "DADS", courseNumber: "5200", title: "Mathematics for Machine Learning", credits: 4, category: "Core", required: false, groupId: "msai-core-math", groupMinCount: 1 },
+  { subject: "DS", courseNumber: "5020", title: "Linear Algebra and Probability for Data Science", credits: 4, category: "Core", required: false, groupId: "msai-core-math", groupMinCount: 1 },
+
+  // Core 4: EECE 5644 or DADS 7275 (choose 1)
+  { subject: "EECE", courseNumber: "5644", title: "Intro to Machine Learning and Pattern Recognition", credits: 4, category: "Core", required: false, groupId: "msai-core-ml", groupMinCount: 1 },
+  { subject: "DADS", courseNumber: "7275", title: "Machine Learning and Data Analytics", credits: 4, category: "Core", required: false, groupId: "msai-core-ml", groupMinCount: 1 },
+
+  // ── Specialization (2 courses from one area, 8 credits) ─────────────────
+  // Computer Vision
+  { subject: "CS", courseNumber: "5330", title: "Pattern Recognition and Computer Vision", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "EECE", courseNumber: "5639", title: "Computer Vision", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "EECE", courseNumber: "7370", title: "Advanced Computer Vision", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
   // Machine Learning
-  { subject: "CS", courseNumber: "6220", title: "Data Mining Techniques", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "7140", title: "Advanced Machine Learning", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "7150", title: "Deep Learning", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "DS", courseNumber: "5230", title: "Unsupervised Machine Learning and Data Mining", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  // Knowledge Management and Reasoning
-  { subject: "CS", courseNumber: "6120", title: "Natural Language Processing", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "6200", title: "Information Retrieval", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
-  { subject: "CS", courseNumber: "7290", title: "Special Topics in Data Science", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 3 },
+  { subject: "CS", courseNumber: "7140", title: "Advanced Machine Learning", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "CS", courseNumber: "7150", title: "Deep Learning", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "CS", courseNumber: "6220", title: "Data Mining Techniques", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "DS", courseNumber: "5230", title: "Unsupervised Machine Learning and Data Mining", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  // Robotics & Agent-Based Systems
+  { subject: "CS", courseNumber: "5180", title: "Reinforcement Learning and Sequential Decision Making", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "CS", courseNumber: "5335", title: "Robotic Science and Systems", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "EECE", courseNumber: "5550", title: "Mobile Robotics", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
+  { subject: "EECE", courseNumber: "5554", title: "Robotics Sensing and Navigation", credits: 4, category: "Elective", required: false, groupId: "msai-spec", groupMinCount: 2 },
 ];
 
 export const MSAI_TOTAL_CREDITS = 32;
 
 // ──────────────────────────────────────────────────────────────────────────────
-// MS Data Science — Boston (32 credits, min 3.000 GPA)
+// MS Data Science (32 credits, min 3.000 GPA)
 // ──────────────────────────────────────────────────────────────────────────────
-// Core: 4 required courses (16 credits)
-//   DS 5110, CS 5800, CS 6140, DS 5500
-// Concentration: 4 courses (16 credits) — CS concentration listed below
+// Core: 4 courses (16 credits) — some with OR options
+//   DS 5110, CS 5800 or EECE 7205, CS 6140 or EECE 5644, DS 5500
+// Concentration: 4 courses (16 credits) — CS or Engineering
 
 export const MSDS_REQUIREMENTS: RequirementCourse[] = [
   // ── Required Core (16 credits) ──────────────────────────────────────────
   { subject: "DS", courseNumber: "5110", title: "Essentials of Data Science", credits: 4, category: "Core", required: true },
-  { subject: "CS", courseNumber: "5800", title: "Algorithms", credits: 4, category: "Core", required: true },
-  { subject: "CS", courseNumber: "6140", title: "Machine Learning", credits: 4, category: "Core", required: true },
   { subject: "DS", courseNumber: "5500", title: "Data Science Capstone", credits: 4, category: "Capstone", required: true },
+
+  // Core: CS 5800 or EECE 7205 (choose 1)
+  { subject: "CS", courseNumber: "5800", title: "Algorithms", credits: 4, category: "Core", required: false, groupId: "msds-core-algo", groupMinCount: 1 },
+  { subject: "EECE", courseNumber: "7205", title: "Fundamentals of Computer Engineering", credits: 4, category: "Core", required: false, groupId: "msds-core-algo", groupMinCount: 1 },
+
+  // Core: CS 6140 or EECE 5644 (choose 1)
+  { subject: "CS", courseNumber: "6140", title: "Machine Learning", credits: 4, category: "Core", required: false, groupId: "msds-core-ml", groupMinCount: 1 },
+  { subject: "EECE", courseNumber: "5644", title: "Intro to Machine Learning and Pattern Recognition", credits: 4, category: "Core", required: false, groupId: "msds-core-ml", groupMinCount: 1 },
 
   // ── CS Concentration (choose ≥4 from list, 16 credits) ──────────────────
   { subject: "CS", courseNumber: "5100", title: "Foundations of Artificial Intelligence", credits: 4, category: "Elective", required: false, groupId: "msds-cs-conc", groupMinCount: 4 },
@@ -168,7 +172,7 @@ export interface Program {
 export const PROGRAMS: Record<ProgramId, Program> = {
   MSCS: {
     id: "MSCS",
-    name: "MS Computer Science (Seattle)",
+    name: "MS Computer Science (MSCS)",
     totalCredits: MSCS_TOTAL_CREDITS,
     requirements: MSCS_REQUIREMENTS,
     electiveMinNumber: MSCS_ELECTIVE_MIN_NUMBER,
@@ -176,7 +180,7 @@ export const PROGRAMS: Record<ProgramId, Program> = {
   },
   MSAI: {
     id: "MSAI",
-    name: "MS Artificial Intelligence (Seattle)",
+    name: "MS Artificial Intelligence (MSAI)",
     totalCredits: MSAI_TOTAL_CREDITS,
     requirements: MSAI_REQUIREMENTS,
     electiveMinNumber: 5000,
@@ -184,7 +188,7 @@ export const PROGRAMS: Record<ProgramId, Program> = {
   },
   MSDS: {
     id: "MSDS",
-    name: "MS Data Science (Boston)",
+    name: "MS Data Science (MSDS)",
     totalCredits: MSDS_TOTAL_CREDITS,
     requirements: MSDS_REQUIREMENTS,
     electiveMinNumber: 5000,
