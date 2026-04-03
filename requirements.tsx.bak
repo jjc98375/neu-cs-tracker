@@ -1,0 +1,248 @@
+import React, { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+
+export default function GradRequirementsTracker() {
+  const [expandedProgram, setExpandedProgram] = useState('mscs');
+  const [completedCourses, setCompletedCourses] = useState({
+    mscs: [],
+    msds: [],
+    msai: []
+  });
+
+  const programs = {
+    mscs: {
+      name: 'MS Computer Science (MSCS)',
+      totalHours: 32,
+      gpa: 3.0,
+      campuses: ['Boston', 'Seattle', 'Silicon Valley', 'Arlington', 'Miami', 'Oakland', 'Portland', 'Vancouver'],
+      sections: [
+        {
+          title: 'Core Requirements',
+          hours: 8,
+          courses: [
+            { code: 'CS 5010 & CS 5011', name: 'Programming Design Paradigm + Recitation', hours: 4 },
+            { code: 'CS 5800', name: 'Algorithms', hours: 4 }
+          ]
+        },
+        {
+          title: 'Breadth Areas (Pick 3 courses from 2 areas)',
+          hours: 12,
+          courses: [
+            {
+              code: 'AI & Data Science',
+              name: 'CS 5100, 5150, 5200, 5330, 6120, 6140, 6200, 6220, 6240, 7140',
+              hours: 'variable'
+            },
+            {
+              code: 'Systems & Software',
+              name: 'CS 5400, 5500, 5520, 5600, 5610, 5700, 5850, 6410, 6510, 6620, 6650',
+              hours: 'variable'
+            },
+            {
+              code: 'Theory & Security',
+              name: 'CS 6760, 7805, CY 5770, CY 6740',
+              hours: 'variable'
+            }
+          ]
+        },
+        {
+          title: 'Electives',
+          hours: 12,
+          courses: [
+            {
+              code: 'Any CS/CY/DS courses',
+              name: 'CS 5097-7980, CS 7990 (Thesis), CS 8674 (Project), CY courses, DS courses',
+              hours: 'variable'
+            }
+          ]
+        }
+      ]
+    },
+    msds: {
+      name: 'MS Data Science (MSDS)',
+      totalHours: 32,
+      gpa: 3.0,
+      campuses: ['Boston', 'Seattle', 'Silicon Valley', 'Portland'],
+      sections: [
+        {
+          title: 'Core Requirements',
+          hours: 16,
+          courses: [
+            { code: 'DS 5110', name: 'Essentials of Data Science (Programming with Data)', hours: 4 },
+            { code: 'CS 5800 or EECE 7205', name: 'Algorithms or Fundamentals of Computer Engineering', hours: 4 },
+            { code: 'CS 6140 or EECE 5644', name: 'Machine Learning or Intro to ML & Pattern Recognition', hours: 4 },
+            { code: 'DS 5500', name: 'Data Science Capstone', hours: 4 }
+          ]
+        },
+        {
+          title: 'Concentration (pick one)',
+          hours: 0,
+          courses: [
+            { code: 'CS Concentration', name: 'Computer Science—Khoury College (additional requirements)', hours: '16+' },
+            { code: 'Eng Concentration', name: 'Engineering Theory & Modeling—College of Engineering (additional requirements)', hours: '16+' }
+          ]
+        }
+      ]
+    },
+    msai: {
+      name: 'MS Artificial Intelligence (MSAI)',
+      totalHours: 32,
+      gpa: 3.0,
+      campuses: ['Boston', 'Seattle', 'Silicon Valley', 'Portland'],
+      sections: [
+        {
+          title: 'Core Requirements (5 courses)',
+          hours: 20,
+          courses: [
+            { code: 'CS 5100', name: 'Foundations of Artificial Intelligence', hours: 4 },
+            { code: 'CS 5130', name: 'Applied Programming and Data Processing for AI', hours: 4 },
+            { code: 'DADS 5200 or DS 5020', name: 'Mathematics for ML or Linear Algebra & Probability', hours: 4 },
+            { code: 'EECE 5644 or DADS 7275', name: 'Intro ML & Pattern Recognition or ML & Data Analytics', hours: 4 },
+            { code: 'Capstone/Specialization Elective', name: 'Varies by specialization chosen', hours: 4 }
+          ]
+        },
+        {
+          title: 'Specialization Options (2 courses from one area)',
+          hours: 8,
+          courses: [
+            { code: 'Computer Vision', name: 'College of Engineering concentration', hours: '8+' },
+            { code: 'Machine Learning', name: 'Khoury College concentration', hours: '8+' },
+            { code: 'Robotics & Agent Systems', name: 'Khoury College concentration', hours: '8+' },
+            { code: 'Continuous Process Eng', name: 'College of Engineering concentration', hours: '8+' },
+            { code: 'Energy Systems', name: 'College of Engineering concentration', hours: '8+' }
+          ]
+        },
+        {
+          title: 'Path Options',
+          hours: 0,
+          courses: [
+            { code: 'Option 1', name: 'Specialization (2 electives from chosen area)', hours: 'included' },
+            { code: 'Option 2', name: 'Thesis (independent research)', hours: 'included' },
+            { code: 'Option 3', name: 'Coursework Only (2 general electives)', hours: 'included' }
+          ]
+        }
+      ]
+    }
+  };
+
+  const toggleProgram = (program) => {
+    setExpandedProgram(expandedProgram === program ? null : program);
+  };
+
+  const toggleCourse = (program, courseCode) => {
+    setCompletedCourses(prev => ({
+      ...prev,
+      [program]: prev[program].includes(courseCode)
+        ? prev[program].filter(c => c !== courseCode)
+        : [...prev[program], courseCode]
+    }));
+  };
+
+  const calculateProgress = (program) => {
+    const prog = programs[program];
+    // Rough calculation assuming each course is roughly 4 hours
+    const completedHours = completedCourses[program].length * 4;
+    return Math.min(100, (completedHours / prog.totalHours) * 100);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-red-900 mb-2">Northeastern Grad Requirements</h1>
+          <p className="text-red-700">Unified tracker for MSCS, MSDS, and MSAI programs</p>
+          <p className="text-sm text-red-600 mt-2">✓ Same requirements across all campuses (Boston, Seattle, Silicon Valley, etc.)</p>
+        </div>
+
+        <div className="space-y-4">
+          {Object.entries(programs).map(([key, program]) => (
+            <div key={key} className="bg-white rounded-lg shadow-lg overflow-hidden border-l-4 border-red-600">
+              {/* Header */}
+              <button
+                onClick={() => toggleProgram(key)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-red-50 transition-colors"
+              >
+                <div className="flex-1 text-left">
+                  <h2 className="text-2xl font-bold text-red-900">{program.name}</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {program.totalHours} semester hours | Min GPA: {program.gpa.toFixed(1)} | {program.campuses.length} campuses
+                  </p>
+                </div>
+                {expandedProgram === key ? <ChevronUp className="text-red-600" size={28} /> : <ChevronDown className="text-red-600" size={28} />}
+              </button>
+
+              {/* Progress Bar */}
+              <div className="px-6 py-2 bg-gray-50 border-t">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-700">Progress</span>
+                  <span className="font-semibold text-red-600">{Math.round(calculateProgress(key))}%</span>
+                </div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div 
+                    className="bg-red-600 h-2 rounded-full transition-all"
+                    style={{ width: `${calculateProgress(key)}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Content */}
+              {expandedProgram === key && (
+                <div className="px-6 py-4 border-t space-y-6">
+                  {program.sections.map((section, idx) => (
+                    <div key={idx} className="border-l-4 border-red-200 pl-4">
+                      <div className="flex justify-between items-baseline mb-3">
+                        <h3 className="text-lg font-semibold text-red-900">{section.title}</h3>
+                        {section.hours > 0 && <span className="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-full">{section.hours} hours</span>}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {section.courses.map((course, cidx) => (
+                          <label key={cidx} className="flex items-start p-2 hover:bg-gray-50 rounded cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={completedCourses[key].includes(course.code)}
+                              onChange={() => toggleCourse(key, course.code)}
+                              className="mt-1 w-4 h-4 accent-red-600"
+                            />
+                            <div className="ml-3 flex-1">
+                              <p className={`font-mono text-sm font-semibold ${completedCourses[key].includes(course.code) ? 'line-through text-gray-400' : 'text-red-700'}`}>
+                                {course.code}
+                              </p>
+                              <p className={`text-sm ${completedCourses[key].includes(course.code) ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                                {course.name}
+                              </p>
+                              {course.hours !== 'variable' && course.hours !== '0' && course.hours !== 'included' && (
+                                <p className="text-xs text-gray-500 mt-1">{course.hours} semester hours</p>
+                              )}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Campuses Info */}
+                  <div className="mt-4 p-3 bg-blue-50 rounded text-sm text-gray-700 border-l-4 border-blue-400">
+                    <p className="font-semibold text-blue-900 mb-1">Available at these campuses:</p>
+                    <p>{program.campuses.join(', ')}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-8 p-4 bg-white rounded-lg shadow text-sm text-gray-600 border-t-4 border-red-600">
+          <p className="font-semibold text-gray-800 mb-2">Important Notes:</p>
+          <ul className="space-y-1 list-disc list-inside">
+            <li><strong>Align Programs:</strong> Add 36-44 hours (includes bridge courses for non-CS backgrounds)</li>
+            <li><strong>GPA Requirement:</strong> All programs require minimum 3.0 cumulative GPA</li>
+            <li><strong>Unified Standards:</strong> Same degree requirements across all Northeastern campuses</li>
+            <li><strong>Completion:</strong> Typical completion is 2-2.5 years (with or without co-op)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}

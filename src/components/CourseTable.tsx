@@ -6,6 +6,13 @@ import { SessionBadge } from "./SessionBadge";
 import { ChevronDown, ChevronUp, Users, Clock, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 
+/** Decode HTML entities like &amp; &lt; etc. */
+function decodeHtml(html: string): string {
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}
+
 interface Props {
   courses: CourseSection[];
   loading?: boolean;
@@ -158,10 +165,20 @@ export function CourseTable({ courses, loading }: Props) {
                   <span className="text-slate-400 text-xs ml-1">/ {c.maximumEnrollment}</span>
                 </td>
                 <td className="px-3 py-2 text-slate-600 dark:text-slate-300 truncate max-w-[12rem]">
-                  {c.faculty
-                    .filter((f) => f.primaryIndicator)
-                    .map((f) => f.displayName)
-                    .join(", ") || "TBA"}
+                  {(() => {
+                    // Check top-level faculty first, then meetingsFaculty
+                    const topLevel = c.faculty
+                      .filter((f) => f.primaryIndicator && f.displayName)
+                      .map((f) => f.displayName);
+                    if (topLevel.length > 0) return topLevel.join(", ");
+                    // Fall back to meetingsFaculty
+                    const fromMeetings = c.meetingsFaculty
+                      .flatMap((mf) => mf.faculty)
+                      .filter((f) => f.primaryIndicator && f.displayName)
+                      .map((f) => f.displayName);
+                    const unique = [...new Set(fromMeetings)];
+                    return unique.length > 0 ? unique.join(", ") : "TBA";
+                  })()}
                 </td>
               </tr>
 
@@ -174,9 +191,11 @@ export function CourseTable({ courses, loading }: Props) {
                     ) : descriptions[c.courseReferenceNumber] ? (
                       <div className="mb-4 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#1e2537] rounded-lg px-4 py-3 border border-slate-200 dark:border-[#243049]">
                         <span className="font-semibold text-slate-700 dark:text-slate-200 block mb-1">Course Description</span>
-                        {descriptions[c.courseReferenceNumber]}
+                        <div dangerouslySetInnerHTML={{ __html: descriptions[c.courseReferenceNumber]! }} />
                       </div>
-                    ) : null}
+                    ) : (
+                      <div className="text-slate-400 text-sm mb-4">No description available.</div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       {/* Meeting times */}
                       <div>
@@ -260,7 +279,7 @@ export function CourseTable({ courses, loading }: Props) {
                                 key={a.code}
                                 className="bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700 text-xs px-1.5 py-0.5 rounded"
                               >
-                                {a.description}
+                                {decodeHtml(a.description)}
                               </span>
                             ))}
                           </div>
