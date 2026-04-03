@@ -26,26 +26,50 @@ export function CourseTable({ courses, loading }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [descriptions, setDescriptions] = useState<Record<string, string | null>>({});
   const [loadingDesc, setLoadingDesc] = useState<Record<string, boolean>>({});
+  const [facultyMap, setFacultyMap] = useState<Record<string, string>>({});
+  const [loadingFaculty, setLoadingFaculty] = useState<Record<string, boolean>>({});
 
+  // Fetch description + faculty when a row is expanded
   useEffect(() => {
     if (!expanded) return;
     const course = courses.find((c) => c.courseReferenceNumber === expanded);
     if (!course) return;
-    if (expanded in descriptions) return; // already fetched
 
-    setLoadingDesc((prev) => ({ ...prev, [expanded]: true }));
-    fetch(`/api/course-description?crn=${expanded}&term=${course.term}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setDescriptions((prev) => ({ ...prev, [expanded]: data.description ?? null }));
-      })
-      .catch(() => {
-        setDescriptions((prev) => ({ ...prev, [expanded]: null }));
-      })
-      .finally(() => {
-        setLoadingDesc((prev) => ({ ...prev, [expanded]: false }));
-      });
-  }, [expanded, courses, descriptions]);
+    // Fetch description
+    if (!(expanded in descriptions)) {
+      setLoadingDesc((prev) => ({ ...prev, [expanded]: true }));
+      fetch(`/api/course-description?crn=${expanded}&term=${course.term}`)
+        .then((r) => r.json())
+        .then((data) => {
+          setDescriptions((prev) => ({ ...prev, [expanded]: data.description ?? null }));
+        })
+        .catch(() => {
+          setDescriptions((prev) => ({ ...prev, [expanded]: null }));
+        })
+        .finally(() => {
+          setLoadingDesc((prev) => ({ ...prev, [expanded]: false }));
+        });
+    }
+
+    // Fetch faculty
+    if (!(expanded in facultyMap)) {
+      setLoadingFaculty((prev) => ({ ...prev, [expanded]: true }));
+      fetch(`/api/faculty?crn=${expanded}&term=${course.term}`)
+        .then((r) => r.json())
+        .then((data) => {
+          const names = (data.faculty ?? [])
+            .map((f: { displayName: string }) => f.displayName)
+            .join(", ");
+          setFacultyMap((prev) => ({ ...prev, [expanded]: names || "" }));
+        })
+        .catch(() => {
+          setFacultyMap((prev) => ({ ...prev, [expanded]: "" }));
+        })
+        .finally(() => {
+          setLoadingFaculty((prev) => ({ ...prev, [expanded]: false }));
+        });
+    }
+  }, [expanded, courses, descriptions, facultyMap]);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -166,12 +190,15 @@ export function CourseTable({ courses, loading }: Props) {
                 </td>
                 <td className="px-3 py-2 text-slate-600 dark:text-slate-300 truncate max-w-[12rem]">
                   {(() => {
-                    // Check top-level faculty first, then meetingsFaculty
+                    // Use fetched faculty if available
+                    if (c.courseReferenceNumber in facultyMap) {
+                      return facultyMap[c.courseReferenceNumber] || "TBA";
+                    }
+                    // Check top-level faculty, then meetingsFaculty
                     const topLevel = c.faculty
                       .filter((f) => f.primaryIndicator && f.displayName)
                       .map((f) => f.displayName);
                     if (topLevel.length > 0) return topLevel.join(", ");
-                    // Fall back to meetingsFaculty
                     const fromMeetings = c.meetingsFaculty
                       .flatMap((mf) => mf.faculty)
                       .filter((f) => f.primaryIndicator && f.displayName)

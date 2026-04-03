@@ -188,7 +188,7 @@ export async function getPartsOfTerm(termCode: string) {
 
 /**
  * Fetch course description from Banner catalog.
- * Requires a session cookie established via term/search POST.
+ * Banner returns HTML (not JSON), so we parse the text content.
  */
 export async function getCourseDescription(
   crn: string,
@@ -196,11 +196,46 @@ export async function getCourseDescription(
 ): Promise<string | null> {
   const cookies = await establishSession(term);
   const res = await bannerGet(
-    `/courseSearchResults/getCourseDescription?courseReferenceNumber=${crn}`,
+    `/courseSearchResults/getCourseDescription?term=${term}&courseReferenceNumber=${crn}`,
+    { cookieJar: cookies }
+  );
+  const html = await res.text();
+  // Strip HTML tags to get plain text description
+  const text = html
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text || text.toLowerCase().includes("no course description is available")) {
+    return null;
+  }
+  return text;
+}
+
+/**
+ * Fetch faculty and meeting times for a specific section.
+ * The search endpoint doesn't return faculty — this separate call does.
+ */
+export async function getFacultyMeetingTimes(
+  crn: string,
+  term: string
+): Promise<{ displayName: string; primaryIndicator: boolean }[]> {
+  const cookies = await establishSession(term);
+  const res = await bannerGet(
+    `/searchResults/getFacultyMeetingTimes?term=${term}&courseReferenceNumber=${crn}`,
     { cookieJar: cookies }
   );
   const data = await res.json();
-  return data?.description ?? null;
+  const faculty: { displayName: string; primaryIndicator: boolean }[] = [];
+  const seen = new Set<string>();
+  for (const fmt of data?.fmt ?? []) {
+    for (const f of fmt?.faculty ?? []) {
+      if (f.displayName && !seen.has(f.displayName)) {
+        seen.add(f.displayName);
+        faculty.push({ displayName: f.displayName, primaryIndicator: f.primaryIndicator });
+      }
+    }
+  }
+  return faculty;
 }
 
 /**
