@@ -8,7 +8,7 @@ export async function apiGet<T = unknown>(path: string): Promise<{ status: numbe
 
 export const TEST_TERMS = {
   fall2025:       "202530",
-  spring2026:     "202610",
+  fall2026:       "202710",
   summerFull2026: "202650",
 } as const;
 

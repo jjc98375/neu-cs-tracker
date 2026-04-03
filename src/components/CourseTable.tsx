@@ -1,9 +1,10 @@
 "use client";
 
+import React from "react";
 import type { CourseSection, SummerSession } from "@/lib/types";
 import { SessionBadge } from "./SessionBadge";
 import { ChevronDown, ChevronUp, Users, Clock, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   courses: CourseSection[];
@@ -16,6 +17,28 @@ export function CourseTable({ courses, loading }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("courseNumber");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [descriptions, setDescriptions] = useState<Record<string, string | null>>({});
+  const [loadingDesc, setLoadingDesc] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!expanded) return;
+    const course = courses.find((c) => c.courseReferenceNumber === expanded);
+    if (!course) return;
+    if (expanded in descriptions) return; // already fetched
+
+    setLoadingDesc((prev) => ({ ...prev, [expanded]: true }));
+    fetch(`/api/course-description?crn=${expanded}&term=${course.term}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setDescriptions((prev) => ({ ...prev, [expanded]: data.description ?? null }));
+      })
+      .catch(() => {
+        setDescriptions((prev) => ({ ...prev, [expanded]: null }));
+      })
+      .finally(() => {
+        setLoadingDesc((prev) => ({ ...prev, [expanded]: false }));
+      });
+  }, [expanded, courses, descriptions]);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -49,7 +72,7 @@ export function CourseTable({ courses, loading }: Props) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-48 text-gray-400">
+      <div className="flex items-center justify-center h-48 text-slate-400">
         <div className="animate-pulse text-lg">Loading courses…</div>
       </div>
     );
@@ -57,21 +80,15 @@ export function CourseTable({ courses, loading }: Props) {
 
   if (courses.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-400">
+      <div className="text-center py-16 text-slate-400">
         No courses found. Try adjusting your filters.
       </div>
     );
   }
 
-  const Th = ({
-    col,
-    children,
-  }: {
-    col: SortKey;
-    children: React.ReactNode;
-  }) => (
+  const Th = ({ col, children }: { col: SortKey; children: React.ReactNode }) => (
     <th
-      className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide cursor-pointer select-none hover:bg-gray-100 whitespace-nowrap"
+      className="px-3 py-2 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide cursor-pointer select-none hover:bg-slate-100 dark:hover:bg-[#1e2537] whitespace-nowrap"
       onClick={() => handleSort(col)}
     >
       {children}
@@ -80,54 +97,47 @@ export function CourseTable({ courses, loading }: Props) {
   );
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200">
+    <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-[#243049] shadow-sm">
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
+        <thead className="bg-slate-50 dark:bg-[#161c2d] border-b border-slate-200 dark:border-[#243049]">
           <tr>
             <th className="w-8 px-3 py-2" />
             <Th col="courseNumber">Course</Th>
             <Th col="courseTitle">Title</Th>
-            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">CRN</th>
+            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">CRN</th>
             <Th col="campusDescription">Campus</Th>
             <Th col="summerSession">Session</Th>
             <Th col="seatsAvailable">Seats</Th>
-            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Instructor</th>
+            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Instructor</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-white dark:bg-[#0d1117]">
           {sorted.map((c) => (
-            <>
+            <React.Fragment key={c.courseReferenceNumber}>
               <tr
-                key={c.courseReferenceNumber}
-                className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                className="border-b border-slate-100 dark:border-[#1e2537] hover:bg-slate-50 dark:hover:bg-[#161c2d] cursor-pointer transition-colors"
                 onClick={() =>
-                  setExpanded(
-                    expanded === c.courseReferenceNumber
-                      ? null
-                      : c.courseReferenceNumber
-                  )
+                  setExpanded(expanded === c.courseReferenceNumber ? null : c.courseReferenceNumber)
                 }
               >
-                <td className="px-3 py-2 text-gray-400">
+                <td className="px-3 py-2 text-slate-400">
                   {expanded === c.courseReferenceNumber ? (
                     <ChevronUp className="w-4 h-4" />
                   ) : (
                     <ChevronDown className="w-4 h-4" />
                   )}
                 </td>
-                <td className="px-3 py-2 font-mono font-semibold text-red-700 whitespace-nowrap">
+                <td className="px-3 py-2 font-mono font-semibold text-red-600 dark:text-red-400 whitespace-nowrap">
                   {c.subject} {c.courseNumber}
-                  <span className="text-gray-400 font-normal ml-1 text-xs">
-                    §{c.sequenceNumber}
-                  </span>
+                  <span className="text-slate-400 font-normal ml-1 text-xs">§{c.sequenceNumber}</span>
                 </td>
-                <td className="px-3 py-2 text-gray-900 max-w-xs truncate">
+                <td className="px-3 py-2 text-slate-900 dark:text-slate-100 max-w-xs truncate">
                   {c.courseTitle}
                 </td>
-                <td className="px-3 py-2 font-mono text-gray-500 text-xs">
+                <td className="px-3 py-2 font-mono text-slate-500 dark:text-slate-400 text-xs">
                   {c.courseReferenceNumber}
                 </td>
-                <td className="px-3 py-2 text-gray-700 whitespace-nowrap">
+                <td className="px-3 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap">
                   {c.campusDescription || "—"}
                 </td>
                 <td className="px-3 py-2">
@@ -145,11 +155,9 @@ export function CourseTable({ courses, loading }: Props) {
                       ? `${c.seatsAvailable} open`
                       : "Full"}
                   </span>
-                  <span className="text-gray-400 text-xs ml-1">
-                    / {c.maximumEnrollment}
-                  </span>
+                  <span className="text-slate-400 text-xs ml-1">/ {c.maximumEnrollment}</span>
                 </td>
-                <td className="px-3 py-2 text-gray-600 truncate max-w-[12rem]">
+                <td className="px-3 py-2 text-slate-600 dark:text-slate-300 truncate max-w-[12rem]">
                   {c.faculty
                     .filter((f) => f.primaryIndicator)
                     .map((f) => f.displayName)
@@ -158,16 +166,25 @@ export function CourseTable({ courses, loading }: Props) {
               </tr>
 
               {expanded === c.courseReferenceNumber && (
-                <tr key={`${c.courseReferenceNumber}-detail`} className="bg-gray-50 border-b border-gray-200">
+                <tr key={`${c.courseReferenceNumber}-detail`} className="bg-slate-50 dark:bg-[#161c2d] border-b border-slate-200 dark:border-[#243049]">
                   <td colSpan={8} className="px-6 py-4">
+                    {/* Course Description */}
+                    {loadingDesc[c.courseReferenceNumber] ? (
+                      <div className="text-slate-400 text-sm mb-4 animate-pulse">Loading description…</div>
+                    ) : descriptions[c.courseReferenceNumber] ? (
+                      <div className="mb-4 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#1e2537] rounded-lg px-4 py-3 border border-slate-200 dark:border-[#243049]">
+                        <span className="font-semibold text-slate-700 dark:text-slate-200 block mb-1">Course Description</span>
+                        {descriptions[c.courseReferenceNumber]}
+                      </div>
+                    ) : null}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       {/* Meeting times */}
                       <div>
-                        <div className="font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                        <div className="font-semibold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-1">
                           <Clock className="w-4 h-4" /> Schedule
                         </div>
                         {c.meetingsFaculty.length === 0 ? (
-                          <span className="text-gray-400">TBA</span>
+                          <span className="text-slate-400">TBA</span>
                         ) : (
                           c.meetingsFaculty.map((mf, i) => {
                             const mt = mf.meetingTime;
@@ -176,17 +193,13 @@ export function CourseTable({ courses, loading }: Props) {
                               .map((d) => d.slice(0, 3).toUpperCase())
                               .join(" ");
                             return (
-                              <div key={i} className="text-gray-600 mb-1">
+                              <div key={i} className="text-slate-600 dark:text-slate-300 mb-1">
                                 <span className="font-mono">{days || "—"}</span>
                                 {mt.beginTime && mt.endTime && (
-                                  <span className="ml-2">
-                                    {mt.beginTime}–{mt.endTime}
-                                  </span>
+                                  <span className="ml-2">{mt.beginTime}–{mt.endTime}</span>
                                 )}
                                 {mt.startDate && mt.endDate && (
-                                  <span className="text-gray-400 ml-2 text-xs">
-                                    ({mt.startDate} – {mt.endDate})
-                                  </span>
+                                  <span className="text-slate-400 ml-2 text-xs">({mt.startDate} – {mt.endDate})</span>
                                 )}
                               </div>
                             );
@@ -196,18 +209,16 @@ export function CourseTable({ courses, loading }: Props) {
 
                       {/* Location */}
                       <div>
-                        <div className="font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                        <div className="font-semibold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-1">
                           <MapPin className="w-4 h-4" /> Location
                         </div>
                         {c.meetingsFaculty.map((mf, i) => {
                           const mt = mf.meetingTime;
                           return (
-                            <div key={i} className="text-gray-600">
+                            <div key={i} className="text-slate-600 dark:text-slate-300">
                               {mt.campusDescription || "—"}
                               {mt.buildingDescription && (
-                                <span className="text-gray-400 ml-1">
-                                  · {mt.buildingDescription} {mt.room}
-                                </span>
+                                <span className="text-slate-400 ml-1">· {mt.buildingDescription} {mt.room}</span>
                               )}
                             </div>
                           );
@@ -216,43 +227,30 @@ export function CourseTable({ courses, loading }: Props) {
 
                       {/* Enrollment */}
                       <div>
-                        <div className="font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                        <div className="font-semibold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-1">
                           <Users className="w-4 h-4" /> Enrollment
                         </div>
-                        <div className="text-gray-600">
+                        <div className="text-slate-600 dark:text-slate-300">
                           {c.enrollment} / {c.maximumEnrollment} enrolled
                         </div>
                         {c.waitCapacity > 0 && (
-                          <div className="text-gray-500 text-xs mt-1">
+                          <div className="text-slate-500 dark:text-slate-400 text-xs mt-1">
                             Waitlist: {c.waitCount} / {c.waitCapacity}
                           </div>
                         )}
                         <div className="mt-2">
-                          <div className="h-2 rounded-full bg-gray-200 w-full max-w-[10rem]">
+                          <div className="h-2 rounded-full bg-slate-200 dark:bg-[#243049] w-full max-w-[10rem]">
                             <div
-                              className={`h-2 rounded-full ${
-                                c.seatsAvailable > 0
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              }`}
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  (c.enrollment / (c.maximumEnrollment || 1)) * 100
-                                )}%`,
-                              }}
+                              className={`h-2 rounded-full ${c.seatsAvailable > 0 ? "bg-green-500" : "bg-red-500"}`}
+                              style={{ width: `${Math.min(100, (c.enrollment / (c.maximumEnrollment || 1)) * 100)}%` }}
                             />
                           </div>
                         </div>
-                        {/* Credits */}
-                        <div className="mt-2 text-gray-500 text-xs">
-                          {c.creditHours ?? c.creditHourHigh ?? "?"} credit(s) ·{" "}
-                          {c.scheduleTypeDescription}
+                        <div className="mt-2 text-slate-500 dark:text-slate-400 text-xs">
+                          {c.creditHours ?? c.creditHourHigh ?? "?"} credit(s) · {c.scheduleTypeDescription}
                         </div>
-                        {/* Part of term */}
-                        <div className="mt-1 text-gray-500 text-xs">
-                          Part of term:{" "}
-                          <span className="font-mono">{c.partOfTerm || "1"}</span>
+                        <div className="mt-1 text-slate-500 dark:text-slate-400 text-xs">
+                          Part of term: <span className="font-mono">{c.partOfTerm || "1"}</span>
                         </div>
                         {/* Attributes */}
                         {c.sectionAttributes?.length > 0 && (
@@ -260,7 +258,7 @@ export function CourseTable({ courses, loading }: Props) {
                             {c.sectionAttributes.map((a) => (
                               <span
                                 key={a.code}
-                                className="bg-purple-50 text-purple-700 border border-purple-200 text-xs px-1.5 py-0.5 rounded"
+                                className="bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700 text-xs px-1.5 py-0.5 rounded"
                               >
                                 {a.description}
                               </span>
@@ -272,7 +270,7 @@ export function CourseTable({ courses, loading }: Props) {
                   </td>
                 </tr>
               )}
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>

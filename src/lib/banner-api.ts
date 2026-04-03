@@ -3,7 +3,7 @@
  * All requests must go through Next.js API routes to avoid CORS issues.
  */
 
-import type { Term, SearchResult, CourseSection, SummerSession } from "./types";
+import type { Term, SearchResult, CourseSection, MeetingTime, SummerSession } from "./types";
 
 const BASE = "https://nubanner.neu.edu/StudentRegistrationSsb/ssb";
 
@@ -11,19 +11,66 @@ const BASE = "https://nubanner.neu.edu/StudentRegistrationSsb/ssb";
 // Helpers
 // ──────────────────────────────────────────────────────────────────────────────
 
-/** Derive summer session from term code suffix + partOfTerm field */
+/**
+ * Infer summer session from meeting time date ranges.
+ * Summer 1 sections end before July; Summer 2 sections start after mid-June.
+ * Sections spanning both are Full.
+ */
+function inferSessionFromDates(
+  meetingTimes: { meetingTime: MeetingTime }[]
+): SummerSession | null {
+  // Find the earliest start and latest end across all meeting times
+  let earliest: Date | null = null;
+  let latest: Date | null = null;
+  for (const mf of meetingTimes) {
+    const mt = mf.meetingTime;
+    if (mt.startDate) {
+      const d = new Date(mt.startDate);
+      if (!earliest || d < earliest) earliest = d;
+    }
+    if (mt.endDate) {
+      const d = new Date(mt.endDate);
+      if (!latest || d > latest) latest = d;
+    }
+  }
+  if (!earliest || !latest) return null;
+
+  // Duration in days
+  const durationDays = (latest.getTime() - earliest.getTime()) / (1000 * 60 * 60 * 24);
+
+  // Summer 1 typically ends by late June (~7 weeks), Summer 2 starts late June (~7 weeks)
+  // Full summer spans ~15 weeks (May to August)
+  // Use duration + end month to distinguish:
+  // - Short duration (< 60 days) ending before July → Summer 1
+  // - Short duration (< 60 days) starting after June 20 → Summer 2
+  // - Long duration (>= 60 days) → Full
+  if (durationDays >= 60) return "Full";
+  if (latest.getMonth() < 6) return "Summer1"; // ends before July (month 6 = July)
+  if (latest.getMonth() === 6 && latest.getDate() <= 5) return "Summer1"; // ends early July at latest
+  if (earliest.getMonth() >= 5 && earliest.getDate() >= 20) return "Summer2"; // starts late June or later
+  if (earliest.getMonth() >= 6) return "Summer2"; // starts in July or later
+  return null;
+}
+
+/** Derive summer session from term code suffix + partOfTerm field + meeting time dates */
 export function deriveSummerSession(
   termCode: string,
-  partOfTerm: string
+  partOfTerm: string,
+  meetingTimes?: { meetingTime: MeetingTime }[]
 ): SummerSession {
   const suffix = termCode.slice(-2);
   // Term-level determination
   if (suffix === "40") return "Summer1";
   if (suffix === "60") return "Summer2";
   if (suffix === "50") {
-    // Full summer term — section-level split
+    // Section-level split via partOfTerm
     if (partOfTerm === "A") return "Summer1";
     if (partOfTerm === "B") return "Summer2";
+    // Fallback: use meeting time date ranges to detect session
+    if (meetingTimes && meetingTimes.length > 0) {
+      const inferred = inferSessionFromDates(meetingTimes);
+      if (inferred) return inferred;
+    }
     if (partOfTerm === "1" || partOfTerm === "") return "Full";
     return "Full";
   }
@@ -87,6 +134,22 @@ async function bannerPost(path: string, body: string, cookies?: string) {
   return res;
 }
 
+/** Extract all cookies from a response as a single Cookie header string. */
+function extractCookies(res: Response): string {
+  // getSetCookie() correctly handles multiple Set-Cookie headers,
+  // unlike parsing the merged set-cookie header which drops cookies.
+  return res.headers.getSetCookie().map((c) => c.split(";")[0].trim()).join("; ");
+}
+
+/** Establish a Banner session for the given term and return session cookies. */
+async function establishSession(term: string): Promise<string> {
+  const res = await bannerPost(
+    "/term/search",
+    `term=${term}&studyPath=&studyPathText=&startDatepicker=&endDatepicker=`
+  );
+  return extractCookies(res);
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Public API functions (called from route handlers)
 // ──────────────────────────────────────────────────────────────────────────────
@@ -109,11 +172,35 @@ export async function getCampuses(termCode: string) {
   return res.json();
 }
 
+export async function bannerGetSubjects(termCode: string) {
+  const res = await bannerGet(
+    `/classSearch/get_subject?searchTerm=&term=${termCode}&offset=1&max=200`
+  );
+  return res.json();
+}
+
 export async function getPartsOfTerm(termCode: string) {
   const res = await bannerGet(
     `/classSearch/get_partOfTerm?searchTerm=&term=${termCode}&offset=1&max=50`
   );
   return res.json();
+}
+
+/**
+ * Fetch course description from Banner catalog.
+ * Requires a session cookie established via term/search POST.
+ */
+export async function getCourseDescription(
+  crn: string,
+  term: string
+): Promise<string | null> {
+  const cookies = await establishSession(term);
+  const res = await bannerGet(
+    `/courseSearchResults/getCourseDescription?courseReferenceNumber=${crn}`,
+    { cookieJar: cookies }
+  );
+  const data = await res.json();
+  return data?.description ?? null;
 }
 
 /**
@@ -128,19 +215,8 @@ export async function searchCourses(params: {
   pageOffset?: number;
   pageMaxSize?: number;
 }): Promise<SearchResult> {
-  // Step 1: POST term/search to get session cookies
-  const sessionRes = await bannerPost(
-    "/term/search",
-    `term=${params.term}&studyPath=&studyPathText=&startDatepicker=&endDatepicker=`
-  );
-  const setCookieHeader = sessionRes.headers.get("set-cookie") ?? "";
-  // Parse all cookies
-  const cookies = setCookieHeader
-    .split(/,(?=[^ ])/)
-    .map((c) => c.split(";")[0].trim())
-    .join("; ");
+  const cookies = await establishSession(params.term);
 
-  // Step 2: Build search query
   const qs = new URLSearchParams({
     txt_term: params.term,
     pageOffset: String(params.pageOffset ?? 0),
@@ -160,10 +236,9 @@ export async function searchCourses(params: {
   );
   const raw: SearchResult = await res.json();
 
-  // Annotate each section with derived summer session
   raw.data = (raw.data ?? []).map((s: CourseSection) => ({
     ...s,
-    summerSession: deriveSummerSession(s.term, s.partOfTerm),
+    summerSession: deriveSummerSession(s.term, s.partOfTerm, s.meetingsFaculty),
   }));
 
   return raw;

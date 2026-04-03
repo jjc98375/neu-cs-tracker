@@ -41,39 +41,39 @@ describe("[integration] Term switching — simulates UI flow", () => {
     }
   });
 
-  it("switching from summer to spring returns different courses", async () => {
+  it("switching from summer to fall2026 returns different courses", async () => {
     const summer = await apiGet<SearchResult>(
       `/api/courses?term=${TEST_TERMS.summerFull2026}&subject=CS`
     );
-    const spring = await apiGet<SearchResult>(
-      `/api/courses?term=${TEST_TERMS.spring2026}&subject=CS`
+    const fall2026 = await apiGet<SearchResult>(
+      `/api/courses?term=${TEST_TERMS.fall2026}&subject=CS`
     );
 
     expect(summer.data.data.length).toBeGreaterThan(0);
-    expect(spring.data.data.length).toBeGreaterThan(0);
+    expect(fall2026.data.data.length).toBeGreaterThan(0);
 
-    for (const section of spring.data.data) {
-      expect(section.term).toBe(TEST_TERMS.spring2026);
+    for (const section of fall2026.data.data) {
+      expect(section.term).toBe(TEST_TERMS.fall2026);
     }
 
     const summerCRNs = new Set(summer.data.data.map((s) => s.courseReferenceNumber));
-    const springCRNs = new Set(spring.data.data.map((s) => s.courseReferenceNumber));
-    const overlap = [...summerCRNs].filter((crn) => springCRNs.has(crn));
+    const fall2026CRNs = new Set(fall2026.data.data.map((s) => s.courseReferenceNumber));
+    const overlap = [...summerCRNs].filter((crn) => fall2026CRNs.has(crn));
     expect(overlap.length).toBeLessThan(summerCRNs.size);
   });
 
   it("rapid sequential term switches all return correct data", async () => {
-    const [fall, spring, summer] = await Promise.all([
+    const [fall, fall2026, summer] = await Promise.all([
       apiGet<SearchResult>(`/api/courses?term=${TEST_TERMS.fall2025}&subject=CS`),
-      apiGet<SearchResult>(`/api/courses?term=${TEST_TERMS.spring2026}&subject=CS`),
+      apiGet<SearchResult>(`/api/courses?term=${TEST_TERMS.fall2026}&subject=CS`),
       apiGet<SearchResult>(`/api/courses?term=${TEST_TERMS.summerFull2026}&subject=CS`),
     ]);
 
     for (const section of fall.data.data) {
       expect(section.term).toBe(TEST_TERMS.fall2025);
     }
-    for (const section of spring.data.data) {
-      expect(section.term).toBe(TEST_TERMS.spring2026);
+    for (const section of fall2026.data.data) {
+      expect(section.term).toBe(TEST_TERMS.fall2026);
     }
     for (const section of summer.data.data) {
       expect(section.term).toBe(TEST_TERMS.summerFull2026);
