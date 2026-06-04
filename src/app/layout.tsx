@@ -48,6 +48,12 @@ export default function RootLayout({
                 >
                   Graduation Planner
                 </Link>
+                <Link
+                  href="/assistant"
+                  className="px-3 py-1.5 rounded-md text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-[#1e2537] transition-colors"
+                >
+                  Assistant
+                </Link>
               </nav>
               <ThemeToggle />
             </div>
