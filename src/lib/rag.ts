@@ -1,5 +1,7 @@
 // src/lib/rag.ts
 import type { Category } from "@/lib/rag-categories";
+import { getOpenAI } from "@/lib/rag-clients";
+import { AVAILABLE_CATEGORIES, CATEGORY_KEYS, isCategory } from "@/lib/rag-categories";
 
 export interface RetrievedChunk {
   content: string;
@@ -55,4 +57,34 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceDoc[] {
     });
   }
   return out;
+}
+
+const CLASSIFIER_MODEL = "gpt-4o-mini";
+
+/** Auto-route a question to one category key, or "unknown" for no filter. */
+export async function classifyCategory(question: string): Promise<Category | "unknown"> {
+  const list = CATEGORY_KEYS.map((k) => `- ${k}: ${AVAILABLE_CATEGORIES[k]}`).join("\n");
+  const completion = await getOpenAI().chat.completions.create({
+    model: CLASSIFIER_MODEL,
+    temperature: 0,
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "user",
+        content:
+          `Classify the student's question into exactly one category key, ` +
+          `or "unknown" if none fit.\n\nCategories:\n${list}\n\n` +
+          `Question: ${question}\n\n` +
+          `Respond with JSON: {"category": "<key or unknown>"}`,
+      },
+    ],
+  });
+  const raw = completion.choices[0]?.message?.content ?? "{}";
+  try {
+    const parsed = JSON.parse(raw) as { category?: string };
+    if (parsed.category && isCategory(parsed.category)) return parsed.category;
+  } catch {
+    /* fall through to unknown */
+  }
+  return "unknown";
 }
