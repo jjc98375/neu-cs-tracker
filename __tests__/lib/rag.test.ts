@@ -99,6 +99,55 @@ describe("retrieve", () => {
   });
 });
 
+import { answerQuestion } from "@/lib/rag";
+
+describe("answerQuestion", () => {
+  function mockFull(opts: { classify?: string; answer: string; chunks: unknown[] }) {
+    const chat = vi.fn()
+      .mockResolvedValueOnce({ choices: [{ message: { content: JSON.stringify({ category: opts.classify }) } }] })
+      .mockResolvedValueOnce({ choices: [{ message: { content: opts.answer } }] });
+    // when category is explicit, only the answer call happens — make create return answer by default too
+    const chatExplicit = vi.fn().mockResolvedValue({ choices: [{ message: { content: opts.answer } }] });
+    vi.mocked(getOpenAI).mockReturnValue({
+      embeddings: { create: vi.fn().mockResolvedValue({ data: [{ embedding: [0.1] }] }) },
+      chat: { completions: { create: opts.classify ? chat : chatExplicit } },
+    } as unknown as ReturnType<typeof getOpenAI>);
+    vi.mocked(getQdrant).mockReturnValue({
+      search: vi.fn().mockResolvedValue(opts.chunks),
+    } as unknown as ReturnType<typeof getQdrant>);
+  }
+
+  it("auto-classifies when no category is given", async () => {
+    mockFull({
+      classify: "visa",
+      answer: "You need an I-20.",
+      chunks: [{ payload: { page_content: "I-20 details", metadata: { filename: "i20.pdf", category: "visa" } } }],
+    });
+    const out = await answerQuestion("F-1 docs?");
+    expect(out.category).toBe("visa");
+    expect(out.categoryName).toBe("Visa");
+    expect(out.answer).toBe("You need an I-20.");
+    expect(out.sources).toEqual([
+      { filename: "i20.pdf", preview: "I-20 details", metadata: { filename: "i20.pdf", category: "visa" } },
+    ]);
+  });
+
+  it("uses the explicit category and skips classification", async () => {
+    mockFull({ answer: "Billing answer.", chunks: [] });
+    const out = await answerQuestion("How do I pay?", "billing");
+    expect(out.category).toBe("billing");
+    expect(out.categoryName).toBe("Billing");
+    expect(out.answer).toBe("Billing answer.");
+  });
+
+  it("reports 'All categories' when classification is unknown", async () => {
+    mockFull({ classify: "weather", answer: "I'm not sure.", chunks: [] });
+    const out = await answerQuestion("random");
+    expect(out.category).toBe("unknown");
+    expect(out.categoryName).toBe("All categories");
+  });
+});
+
 describe("classifyCategory", () => {
   it("returns the category key when the model picks a valid one", async () => {
     mockChat('{"category":"visa"}');

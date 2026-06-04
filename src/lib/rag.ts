@@ -62,6 +62,7 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceDoc[] {
 import { getQdrant, COLLECTION } from "@/lib/rag-clients";
 
 const CLASSIFIER_MODEL = "gpt-4o-mini";
+const ANSWER_MODEL = "gpt-4o-mini";
 const EMBEDDING_MODEL = "text-embedding-3-small"; // MUST match ingest.py
 const TOP_K = 6;
 
@@ -128,4 +129,37 @@ export async function retrieve(
       metadata,
     };
   });
+}
+
+/**
+ * Single-shot RAG: resolve category (auto-classify if absent) → retrieve →
+ * build prompt → generate answer → dedupe sources.
+ */
+export async function answerQuestion(
+  question: string,
+  category?: Category,
+): Promise<AssistantAnswer> {
+  const resolved: Category | "unknown" = category ?? (await classifyCategory(question));
+
+  const chunks = await retrieve(question, resolved);
+  const context = chunks.map((c) => c.content).join("\n\n");
+
+  const label =
+    resolved === "unknown"
+      ? "Northeastern international student topics"
+      : AVAILABLE_CATEGORIES[resolved];
+
+  const completion = await getOpenAI().chat.completions.create({
+    model: ANSWER_MODEL,
+    temperature: 0.2,
+    messages: [{ role: "user", content: buildPrompt(label, context, question) }],
+  });
+
+  return {
+    category: resolved,
+    categoryName: resolved === "unknown" ? "All categories" : AVAILABLE_CATEGORIES[resolved],
+    question,
+    answer: completion.choices[0]?.message?.content ?? "",
+    sources: dedupeSources(chunks),
+  };
 }
