@@ -2,6 +2,7 @@
 "use client";
 
 export interface ChatEntry {
+  id?: string;
   question: string;
   answer?: string;
   categoryName?: string;

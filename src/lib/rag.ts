@@ -1,6 +1,6 @@
 // src/lib/rag.ts
 import type { Category } from "@/lib/rag-categories";
-import { getOpenAI } from "@/lib/rag-clients";
+import { getOpenAI, getQdrant, COLLECTION } from "@/lib/rag-clients";
 import { AVAILABLE_CATEGORIES, CATEGORY_KEYS, isCategory } from "@/lib/rag-categories";
 
 export interface RetrievedChunk {
@@ -59,8 +59,6 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceDoc[] {
   return out;
 }
 
-import { getQdrant, COLLECTION } from "@/lib/rag-clients";
-
 const CLASSIFIER_MODEL = "gpt-4o-mini";
 const ANSWER_MODEL = "gpt-4o-mini";
 const EMBEDDING_MODEL = "text-embedding-3-small"; // MUST match ingest.py
@@ -105,6 +103,8 @@ export async function retrieve(
   });
   const vector = emb.data[0].embedding as number[];
 
+  // LangChain-Qdrant stores each point as { page_content: string, metadata: { filename, category, … } };
+  // the dot-path filter key "metadata.category" matches that nested payload (parity with ingestion/ingest.py).
   const filter =
     category === "unknown"
       ? undefined

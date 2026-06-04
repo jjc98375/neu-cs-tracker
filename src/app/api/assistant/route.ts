@@ -6,7 +6,7 @@ import { isCategory } from "@/lib/rag-categories";
 import type { Category } from "@/lib/rag-categories";
 
 const BodySchema = z.object({
-  question: z.string().trim().min(1, "question is required"),
+  question: z.string().trim().min(1, "question is required").max(2000, "question too long"),
   category: z.string().optional(),
 });
 

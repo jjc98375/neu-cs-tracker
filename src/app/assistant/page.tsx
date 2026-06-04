@@ -16,8 +16,8 @@ export default function AssistantPage() {
     if (!question || busy) return;
     setInput("");
     setBusy(true);
-    const index = entries.length;
-    setEntries((e) => [...e, { question, pending: true }]);
+    const id = crypto.randomUUID();
+    setEntries((e) => [...e, { id, question, pending: true }]);
 
     try {
       const res = await fetch("/api/assistant", {
@@ -27,17 +27,17 @@ export default function AssistantPage() {
       });
       const data = await res.json();
       setEntries((e) =>
-        e.map((entry, i) =>
-          i === index
+        e.map((entry) =>
+          entry.id === id
             ? res.ok
-              ? { question, answer: data.answer, categoryName: data.categoryName, sources: data.sources }
-              : { question, error: data.error ?? `HTTP ${res.status}` }
+              ? { id, question, answer: data.answer, categoryName: data.categoryName, sources: data.sources }
+              : { id, question, error: data.error ?? `HTTP ${res.status}` }
             : entry,
         ),
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      setEntries((e) => e.map((entry, i) => (i === index ? { question, error: msg } : entry)));
+      setEntries((e) => e.map((entry) => (entry.id === id ? { id, question, error: msg } : entry)));
     } finally {
       setBusy(false);
     }
@@ -56,7 +56,7 @@ export default function AssistantPage() {
         {entries.length === 0 ? (
           <p className="text-sm text-slate-400">Ask a question to get started.</p>
         ) : (
-          entries.map((entry, i) => <ChatMessage key={i} entry={entry} />)
+          entries.map((entry, i) => <ChatMessage key={entry.id ?? i} entry={entry} />)
         )}
       </div>
 

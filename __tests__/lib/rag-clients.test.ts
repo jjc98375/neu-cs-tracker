@@ -1,5 +1,5 @@
 // __tests__/lib/rag-clients.test.ts
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 describe("rag-clients env validation", () => {
   const saved = { ...process.env };

@@ -50,6 +50,12 @@ describe("POST /api/assistant", () => {
     expect((await res.json()).error).toBe("question is required");
   });
 
+  it("returns 400 when question exceeds 2000 chars", async () => {
+    const res = await POST(postReq({ question: "x".repeat(2001) }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toBe("question too long");
+  });
+
   it("returns 400 for an unknown category", async () => {
     const res = await POST(postReq({ question: "q", category: "weather" }));
     const data = await res.json();
