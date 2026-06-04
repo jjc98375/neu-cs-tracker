@@ -59,7 +59,11 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceDoc[] {
   return out;
 }
 
+import { getQdrant, COLLECTION } from "@/lib/rag-clients";
+
 const CLASSIFIER_MODEL = "gpt-4o-mini";
+const EMBEDDING_MODEL = "text-embedding-3-small"; // MUST match ingest.py
+const TOP_K = 6;
 
 /** Auto-route a question to one category key, or "unknown" for no filter. */
 export async function classifyCategory(question: string): Promise<Category | "unknown"> {
@@ -87,4 +91,41 @@ export async function classifyCategory(question: string): Promise<Category | "un
     /* fall through to unknown */
   }
   return "unknown";
+}
+
+/** Embed the question and run a (optionally category-filtered) similarity search. */
+export async function retrieve(
+  question: string,
+  category: Category | "unknown",
+): Promise<RetrievedChunk[]> {
+  const emb = await getOpenAI().embeddings.create({
+    model: EMBEDDING_MODEL,
+    input: question,
+  });
+  const vector = emb.data[0].embedding as number[];
+
+  const filter =
+    category === "unknown"
+      ? undefined
+      : { must: [{ key: "metadata.category", match: { value: category } }] };
+
+  const results = await getQdrant().search(COLLECTION, {
+    vector,
+    limit: TOP_K,
+    with_payload: true,
+    filter,
+  });
+
+  return results.map((r) => {
+    const payload = (r.payload ?? {}) as {
+      page_content?: string;
+      metadata?: Record<string, unknown>;
+    };
+    const metadata = payload.metadata ?? {};
+    return {
+      content: payload.page_content ?? "",
+      filename: String(metadata.filename ?? "Unknown"),
+      metadata,
+    };
+  });
 }

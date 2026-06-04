@@ -46,6 +46,59 @@ describe("dedupeSources", () => {
   });
 });
 
+import { getQdrant } from "@/lib/rag-clients";
+import { retrieve } from "@/lib/rag";
+
+function mockEmbeddings(vector: number[]) {
+  const createEmb = vi.fn().mockResolvedValue({ data: [{ embedding: vector }] });
+  const createChat = vi.fn();
+  vi.mocked(getOpenAI).mockReturnValue({
+    embeddings: { create: createEmb },
+    chat: { completions: { create: createChat } },
+  } as unknown as ReturnType<typeof getOpenAI>);
+  return createEmb;
+}
+
+describe("retrieve", () => {
+  it("applies a metadata.category filter and maps payloads", async () => {
+    mockEmbeddings([0.1, 0.2, 0.3]);
+    const search = vi.fn().mockResolvedValue([
+      { payload: { page_content: "F-1 info", metadata: { filename: "f1.pdf", category: "visa" } } },
+    ]);
+    vi.mocked(getQdrant).mockReturnValue({ search } as unknown as ReturnType<typeof getQdrant>);
+
+    const chunks = await retrieve("visa question", "visa");
+
+    expect(search).toHaveBeenCalledWith("test_collection", expect.objectContaining({
+      limit: 6,
+      with_payload: true,
+      filter: { must: [{ key: "metadata.category", match: { value: "visa" } }] },
+    }));
+    expect(chunks).toEqual([
+      { content: "F-1 info", filename: "f1.pdf", metadata: { filename: "f1.pdf", category: "visa" } },
+    ]);
+  });
+
+  it("omits the filter when category is 'unknown'", async () => {
+    mockEmbeddings([0.1]);
+    const search = vi.fn().mockResolvedValue([]);
+    vi.mocked(getQdrant).mockReturnValue({ search } as unknown as ReturnType<typeof getQdrant>);
+
+    await retrieve("anything", "unknown");
+
+    expect(search).toHaveBeenCalledWith("test_collection", expect.objectContaining({ filter: undefined }));
+  });
+
+  it("defaults missing payload fields safely", async () => {
+    mockEmbeddings([0.1]);
+    const search = vi.fn().mockResolvedValue([{ payload: {} }]);
+    vi.mocked(getQdrant).mockReturnValue({ search } as unknown as ReturnType<typeof getQdrant>);
+
+    const chunks = await retrieve("q", "visa");
+    expect(chunks[0]).toEqual({ content: "", filename: "Unknown", metadata: {} });
+  });
+});
+
 describe("classifyCategory", () => {
   it("returns the category key when the model picks a valid one", async () => {
     mockChat('{"category":"visa"}');
