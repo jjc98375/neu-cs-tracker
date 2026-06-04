@@ -18,6 +18,13 @@ describe("rag-clients env validation", () => {
     expect(() => getQdrant()).toThrow("Missing required env var: QDRANT_URL");
   });
 
+  it("getQdrant throws a clear error when QDRANT_API_KEY is missing", async () => {
+    process.env.QDRANT_URL = "http://localhost:6333";
+    delete process.env.QDRANT_API_KEY;
+    const { getQdrant } = await import("@/lib/rag-clients");
+    expect(() => getQdrant()).toThrow("Missing required env var: QDRANT_API_KEY");
+  });
+
   it("COLLECTION defaults to northeastern_docs", async () => {
     delete process.env.QDRANT_COLLECTION;
     const { COLLECTION } = await import("@/lib/rag-clients");

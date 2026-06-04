@@ -20,7 +20,7 @@ export function getQdrant(): QdrantClient {
   if (!_qdrant) {
     _qdrant = new QdrantClient({
       url: required("QDRANT_URL"),
-      apiKey: process.env.QDRANT_API_KEY,
+      apiKey: required("QDRANT_API_KEY"),
     });
   }
   return _qdrant;
