@@ -121,6 +121,15 @@ def main():
         collection_name=COLLECTION,
     )
 
+    # Qdrant requires a payload index on any field used in a filter.
+    # The runtime query path filters on metadata.category, so index it here.
+    print("Creating payload index on metadata.category (required for category-filtered search)...")
+    client.create_payload_index(
+        collection_name=COLLECTION,
+        field_name="metadata.category",
+        field_schema=qmodels.PayloadSchemaType.KEYWORD,
+    )
+
     points = client.get_collection(COLLECTION).points_count
     print(f"Done. Collection {COLLECTION!r} now holds {points} points.")
 
