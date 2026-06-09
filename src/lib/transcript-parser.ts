@@ -67,3 +67,93 @@ export function parseInProgressRow(line: string, term: string): PlannedCourse | 
     term,
   };
 }
+
+export interface ParsedTranscript {
+  program?: ProgramId;
+  completed: CompletedCourse[];
+  inProgress: PlannedCourse[];
+  studentName?: string;
+  warnings: string[];
+}
+
+type Section = "HEADER" | "INSTITUTION_CREDIT" | "TOTALS" | "IN_PROGRESS";
+
+const TERM_HEADER = /^Term\s*:\s*(.+?)(?:\s+Semester)?$/;
+
+export function parseTranscript(lines: string[]): ParsedTranscript {
+  const result: ParsedTranscript = { completed: [], inProgress: [], warnings: [] };
+  let section: Section = "HEADER";
+  let term = "";
+  let pending = ""; // accumulates wrapped-title fragments
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    if (line === "Primary Program") {
+      const next = lines[i + 1]?.trim();
+      if (next) result.program = programToId(next);
+      continue;
+    }
+    if (line === "Name") {
+      const next = lines[i + 1]?.trim();
+      if (next) result.studentName = next;
+      continue;
+    }
+    if (line.startsWith("INSTITUTION CREDIT")) { section = "INSTITUTION_CREDIT"; pending = ""; continue; }
+    if (line.startsWith("TRANSCRIPT TOTALS")) { section = "TOTALS"; pending = ""; continue; }
+    if (line.startsWith("COURSE(S) IN PROGRESS")) { section = "IN_PROGRESS"; pending = ""; continue; }
+
+    const termMatch = line.match(TERM_HEADER);
+    if (termMatch) {
+      term = termToCode(termMatch[1]);
+      if (!term) result.warnings.push(`Unrecognized term: "${termMatch[1]}"`);
+      pending = "";
+      continue;
+    }
+
+    if (
+      line.startsWith("Term Totals") ||
+      line.startsWith("Current Term") ||
+      line.startsWith("Cumulative") ||
+      line.startsWith("Subject Course Level") ||
+      line === "Academic Standing" ||
+      line === "Good Standing" ||
+      line.startsWith("Total ")
+    ) {
+      pending = "";
+      continue;
+    }
+
+    if (section === "INSTITUTION_CREDIT" && term) {
+      const candidate = pending ? `${pending} ${line}` : line;
+      const row = parseGradedRow(candidate, term);
+      if (row) {
+        if (isEarnedGrade(row.grade ?? "")) result.completed.push(row);
+        pending = "";
+      } else if (/^[A-Z]{2,4}\s+\d{4}/.test(candidate)) {
+        pending = candidate;
+      } else {
+        pending = "";
+      }
+    } else if (section === "IN_PROGRESS" && term) {
+      const candidate = pending ? `${pending} ${line}` : line;
+      const row = parseInProgressRow(candidate, term);
+      if (row) {
+        result.inProgress.push(row);
+        pending = "";
+      } else if (/^[A-Z]{2,4}\s+\d{4}/.test(candidate)) {
+        pending = candidate;
+      } else {
+        pending = "";
+      }
+    }
+  }
+
+  if (result.completed.length === 0 && result.inProgress.length === 0) {
+    result.warnings.push(
+      "No courses recognized — is this the NEU Unofficial Academic Transcript PDF?"
+    );
+  }
+  return result;
+}
