@@ -83,7 +83,7 @@ International-student Q&A feature at `/assistant`, powered by Retrieval-Augmente
 
 **Env vars** (`OPENAI_API_KEY`, `QDRANT_URL`, `QDRANT_API_KEY`, `QDRANT_COLLECTION=northeastern_docs`): set in Vercel project settings (Production/Preview/Dev) AND locally — `.env.local` (app) and `ingestion/.env` (ingestion) already exist on the dev machine, both gitignored. See `.env.example`.
 
-**Data:** Qdrant Cloud collection `northeastern_docs` (~374 points). To (re)build it: `cd ingestion && python ingest.py` using `ingestion/.venv` (the venv's `.venv/bin/python` is the working interpreter — a miniconda `python` shadows it after `activate`, so call the absolute path).
+**Data:** Qdrant Cloud collection `northeastern_docs` (~439 points, 46 source PDFs as of 2026-06-05). To (re)build it: `cd ingestion && python ingest.py` using `ingestion/.venv` (the venv's `.venv/bin/python` is the working interpreter — a miniconda `python` shadows it after `activate`, so call the absolute path).
 
 **Two gotchas already fixed in `ingest.py` (don't regress):**
 1. langchain 1.x: import `RecursiveCharacterTextSplitter` from `langchain_text_splitters` (not `langchain.text_splitter`).
@@ -91,7 +91,7 @@ International-student Q&A feature at `/assistant`, powered by Retrieval-Augmente
 
 Design spec + implementation plan: `docs/superpowers/specs/2026-06-04-rag-chatbot-integration-design.md`, `docs/superpowers/plans/2026-06-04-rag-chatbot-integration.md`.
 
-**Known content gap:** corpus has CPT / on-campus / unauthorized-employment docs but no OPT-specific PDF; add one to `ingestion/northeastern_docs/Employment/` and re-run ingest to cover OPT questions.
+**Corpus maintenance (last refreshed 2026-06-05):** PDFs are headless-Chrome printouts of live OGS / Student Financial Services pages. Re-capture with `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --no-pdf-header-footer --print-to-pdf="out.pdf" <URL>` then re-run ingest. The 2026-06-05 pass added OPT, STEM OPT, NUSHP enrollment + waiver, and Global Co-op docs, and refreshed 6 stale pages (F-1 visa process — old URL had 404'd and moved to `/ogs/new-students/f-1-visa-process/`; J-1 visa; CPT; arriving-in-US; orientation; fee descriptions). Watch for time-sensitive content that dates the corpus: SEVIS I-901 fee (currently F-1 $350 / J-1 $220), tuition/fee academic year, OGS "Travel Recommendations" year, and USCIS/consular policy-update banners.
 
 ## Testing
 
