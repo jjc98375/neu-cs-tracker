@@ -97,6 +97,39 @@ describe("retrieve", () => {
     const chunks = await retrieve("q", "visa");
     expect(chunks[0]).toEqual({ content: "", filename: "Unknown", metadata: {} });
   });
+
+  it("falls back to an unfiltered search when the filtered top score is weak", async () => {
+    // Mirrors the real misroute: "apply for OPT" classified as visa scores ~0.43
+    // under the visa filter, but the OPT doc scores ~0.71 unfiltered.
+    mockEmbeddings([0.1]);
+    const search = vi.fn()
+      .mockResolvedValueOnce([
+        { score: 0.43, payload: { page_content: "visa stuff", metadata: { filename: "visa.pdf", category: "visa" } } },
+      ])
+      .mockResolvedValueOnce([
+        { score: 0.71, payload: { page_content: "opt stuff", metadata: { filename: "opt.pdf", category: "employment" } } },
+      ]);
+    vi.mocked(getQdrant).mockReturnValue({ search } as unknown as ReturnType<typeof getQdrant>);
+
+    const chunks = await retrieve("how do I apply for OPT", "visa");
+
+    expect(search).toHaveBeenCalledTimes(2);
+    expect(search.mock.calls[1][1]).toMatchObject({ filter: undefined });
+    expect(chunks[0].filename).toBe("opt.pdf");
+  });
+
+  it("does not fall back when the filtered top score is healthy", async () => {
+    mockEmbeddings([0.1]);
+    const search = vi.fn().mockResolvedValue([
+      { score: 0.72, payload: { page_content: "sevis", metadata: { filename: "sevis.pdf", category: "visa" } } },
+    ]);
+    vi.mocked(getQdrant).mockReturnValue({ search } as unknown as ReturnType<typeof getQdrant>);
+
+    const chunks = await retrieve("what is the SEVIS fee", "visa");
+
+    expect(search).toHaveBeenCalledTimes(1);
+    expect(chunks[0].filename).toBe("sevis.pdf");
+  });
 });
 
 import { answerQuestion } from "@/lib/rag";
@@ -162,5 +195,16 @@ describe("classifyCategory", () => {
   it("returns 'unknown' on unparseable output", async () => {
     mockChat("not json");
     expect(await classifyCategory("???")).toBe("unknown");
+  });
+
+  it("gives the model routing guidance for ambiguous work-authorization terms", async () => {
+    const create = mockChat('{"category":"employment"}');
+    await classifyCategory("how do I apply for OPT?");
+    const sent = create.mock.calls[0][0].messages[0].content as string;
+    // OPT/CPT/work authorization must be steered to employment, not visa.
+    // Assert on "CPT" (absent from the question) so this only passes when the
+    // prompt itself carries explicit routing guidance, not the echoed question.
+    expect(sent).toContain("CPT");
+    expect(sent).toMatch(/work authorization|employment authorization/i);
   });
 });

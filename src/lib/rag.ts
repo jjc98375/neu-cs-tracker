@@ -63,6 +63,34 @@ const CLASSIFIER_MODEL = "gpt-4o-mini";
 const ANSWER_MODEL = "gpt-4o-mini";
 const EMBEDDING_MODEL = "text-embedding-3-small"; // MUST match ingest.py
 const TOP_K = 6;
+// If a category-filtered search's best match scores below this cosine floor, the
+// classifier likely misrouted the question (e.g. "apply for OPT" → visa scores ~0.43
+// while the OPT doc scores ~0.71 unfiltered). Below the floor we retry without the
+// filter so a wrong category can't hide an otherwise-strong document.
+const SCORE_FLOOR = 0.5;
+
+interface ScoredResult {
+  score?: number;
+  payload?: { page_content?: string; metadata?: Record<string, unknown> };
+}
+
+function buildFilter(category: Category | "unknown") {
+  return category === "unknown"
+    ? undefined
+    : { must: [{ key: "metadata.category", match: { value: category } }] };
+}
+
+function mapResults(results: ScoredResult[]): RetrievedChunk[] {
+  return results.map((r) => {
+    const payload = r.payload ?? {};
+    const metadata = payload.metadata ?? {};
+    return {
+      content: payload.page_content ?? "",
+      filename: String(metadata.filename ?? "Unknown"),
+      metadata,
+    };
+  });
+}
 
 /** Auto-route a question to one category key, or "unknown" for no filter. */
 export async function classifyCategory(question: string): Promise<Category | "unknown"> {
@@ -77,6 +105,12 @@ export async function classifyCategory(question: string): Promise<Category | "un
         content:
           `Classify the student's question into exactly one category key, ` +
           `or "unknown" if none fit.\n\nCategories:\n${list}\n\n` +
+          `Routing guidance for commonly-confused topics:\n` +
+          `- Any work authorization — OPT, STEM OPT, CPT, co-op, on-campus jobs, ` +
+          `assistantships, employment authorization — goes to "employment", NOT "visa".\n` +
+          `- "visa" is for the consular/entry process only: visa interviews, DS-160, ` +
+          `consulate appointments, SEVIS fee, port of entry.\n` +
+          `- Health insurance / NUSHP, fees, and payments go to "billing" or "tuition".\n\n` +
           `Question: ${question}\n\n` +
           `Respond with JSON: {"category": "<key or unknown>"}`,
       },
@@ -105,30 +139,37 @@ export async function retrieve(
 
   // LangChain-Qdrant stores each point as { page_content: string, metadata: { filename, category, … } };
   // the dot-path filter key "metadata.category" matches that nested payload (parity with ingestion/ingest.py).
-  const filter =
-    category === "unknown"
-      ? undefined
-      : { must: [{ key: "metadata.category", match: { value: category } }] };
-
-  const results = await getQdrant().search(COLLECTION, {
+  const filtered = (await getQdrant().search(COLLECTION, {
     vector,
     limit: TOP_K,
     with_payload: true,
-    filter,
-  });
+    filter: buildFilter(category),
+  })) as ScoredResult[];
 
-  return results.map((r) => {
-    const payload = (r.payload ?? {}) as {
-      page_content?: string;
-      metadata?: Record<string, unknown>;
-    };
-    const metadata = payload.metadata ?? {};
-    return {
-      content: payload.page_content ?? "",
-      filename: String(metadata.filename ?? "Unknown"),
-      metadata,
-    };
-  });
+  // Low-confidence fallback: when a category filter was applied but its best match
+  // is weak (or empty), the classifier likely misrouted — retry unfiltered and keep
+  // whichever surfaced the stronger top match.
+  if (category !== "unknown") {
+    const topScore = typeof filtered[0]?.score === "number" ? filtered[0].score : undefined;
+    const weak = filtered.length === 0 || (topScore !== undefined && topScore < SCORE_FLOOR);
+    if (weak) {
+      const unfiltered = (await getQdrant().search(COLLECTION, {
+        vector,
+        limit: TOP_K,
+        with_payload: true,
+        filter: undefined,
+      })) as ScoredResult[];
+      const unfilteredTop =
+        typeof unfiltered[0]?.score === "number" ? unfiltered[0].score : undefined;
+      const better =
+        unfiltered.length > 0 &&
+        (topScore === undefined ||
+          (unfilteredTop !== undefined && unfilteredTop >= topScore));
+      if (better) return mapResults(unfiltered);
+    }
+  }
+
+  return mapResults(filtered);
 }
 
 /**
