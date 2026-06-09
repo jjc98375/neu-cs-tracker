@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { CompletedCourse, PlannedCourse } from "@/lib/types";
 import type { ProgramId } from "@/lib/requirements";
 import { PROGRAMS, analyzeGraduation } from "@/lib/requirements";
 import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, GraduationCap, TrendingUp } from "lucide-react";
 import { clsx } from "clsx";
+import { TranscriptImport } from "@/components/TranscriptImport";
+import type { ParsedTranscript } from "@/lib/transcript-parser";
+
+const STORAGE_KEY = "neu-cs-tracker:planner";
+
+interface PersistedPlanner {
+  program: ProgramId;
+  completed: CompletedCourse[];
+  planned: PlannedCourse[];
+}
 
 const EMPTY_COMPLETED: CompletedCourse = {
   subject: "", courseNumber: "", title: "", credits: 4, term: "", grade: "",
@@ -47,6 +57,36 @@ export function RequirementChecker() {
   const [newCompleted, setNewCompleted] = useState<CompletedCourse>({ ...EMPTY_COMPLETED });
   const [newPlanned, setNewPlanned] = useState<PlannedCourse>({ ...EMPTY_PLANNED });
 
+  // Hydrate once on mount (client-only; guards SSR).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as PersistedPlanner;
+      if (saved.program) setProgram(saved.program);
+      if (Array.isArray(saved.completed)) setCompleted(saved.completed);
+      if (Array.isArray(saved.planned)) setPlanned(saved.planned);
+    } catch {
+      /* ignore corrupt/unavailable storage */
+    }
+  }, []);
+
+  // Persist on any change.
+  useEffect(() => {
+    try {
+      const payload: PersistedPlanner = { program, completed, planned };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      /* storage full/unavailable — degrade to session-only */
+    }
+  }, [program, completed, planned]);
+
+  function handleImport(result: ParsedTranscript) {
+    if (result.program) setProgram(result.program);
+    setCompleted(result.completed);
+    setPlanned(result.inProgress);
+  }
+
   const analysis = analyzeGraduation(program, completed, planned);
   const prog = PROGRAMS[program];
 
@@ -59,6 +99,7 @@ export function RequirementChecker() {
 
   return (
     <div className="space-y-6">
+      <TranscriptImport onImport={handleImport} />
       {/* Program selector */}
       <div className="flex flex-wrap gap-3">
         {(Object.keys(PROGRAMS) as ProgramId[]).map((pid) => (
