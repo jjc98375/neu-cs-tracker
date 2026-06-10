@@ -26,7 +26,8 @@ describe("buildPrompt", () => {
     expect(p).toContain("specifically answering questions about Visa");
     expect(p).toContain("Context: ctx text");
     expect(p).toContain("Question: Do I need a passport?");
-    expect(p.trimEnd().endsWith("Answer:")).toBe(true);
+    // asks the model to self-report grounding via JSON (drives the web fallback)
+    expect(p).toContain('"answered"');
   });
 });
 
@@ -132,7 +133,7 @@ describe("retrieve", () => {
   });
 });
 
-import { answerQuestion } from "@/lib/rag";
+import { answerQuestion, searchWeb } from "@/lib/rag";
 
 describe("answerQuestion", () => {
   function mockFull(opts: { classify?: string; answer: string; chunks: unknown[] }) {
@@ -178,6 +179,141 @@ describe("answerQuestion", () => {
     const out = await answerQuestion("random");
     expect(out.category).toBe("unknown");
     expect(out.categoryName).toBe("All categories");
+  });
+
+  it("falls back to a live web search when the top retrieval score is below the web floor", async () => {
+    // tuition-type question: classifier picks billing, but no doc scores well (~0.4).
+    const chat = vi.fn().mockResolvedValueOnce({
+      choices: [{ message: { content: JSON.stringify({ category: "billing" }) } }],
+    });
+    const responsesCreate = vi.fn().mockResolvedValue({
+      output_text: "MSCS tuition is approximately $X per credit hour.",
+      output: [
+        { type: "web_search_call" },
+        {
+          type: "message",
+          content: [
+            {
+              annotations: [
+                { type: "url_citation", url: "https://studentfinance.northeastern.edu/tuition/", title: "Tuition - SFS" },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    vi.mocked(getOpenAI).mockReturnValue({
+      embeddings: { create: vi.fn().mockResolvedValue({ data: [{ embedding: [0.1] }] }) },
+      chat: { completions: { create: chat } },
+      responses: { create: responsesCreate },
+    } as unknown as ReturnType<typeof getOpenAI>);
+    vi.mocked(getQdrant).mockReturnValue({
+      search: vi.fn().mockResolvedValue([
+        { score: 0.4, payload: { page_content: "weak", metadata: { filename: "weak.pdf", category: "billing" } } },
+      ]),
+    } as unknown as ReturnType<typeof getQdrant>);
+
+    const out = await answerQuestion("How much is the CS master's tuition?");
+
+    expect(responsesCreate).toHaveBeenCalled();
+    expect(out.viaWeb).toBe(true);
+    expect(out.answer).toContain("per credit");
+    expect(out.sources[0].filename).toBe("Tuition - SFS");
+    expect(out.sources[0].preview).toBe("https://studentfinance.northeastern.edu/tuition/");
+  });
+
+  it("web-falls back when a doc is retrieved but the model can't answer from it", async () => {
+    // The tuition case: a fee doc scores fine (0.6) so the score gate doesn't fire,
+    // but the answer model reports answered:false → still fall back to web.
+    const chat = vi.fn()
+      .mockResolvedValueOnce({ choices: [{ message: { content: JSON.stringify({ category: "tuition" }) } }] })
+      .mockResolvedValueOnce({
+        choices: [{ message: { content: JSON.stringify({ answered: false, answer: "The context doesn't list the per-credit rate." }) } }],
+      });
+    const responsesCreate = vi.fn().mockResolvedValue({
+      output_text: "MSCS tuition is about $X per credit hour.",
+      output: [
+        { type: "message", content: [{ annotations: [{ type: "url_citation", url: "https://studentfinance.northeastern.edu/", title: "SFS" }] }] },
+      ],
+    });
+    vi.mocked(getOpenAI).mockReturnValue({
+      embeddings: { create: vi.fn().mockResolvedValue({ data: [{ embedding: [0.1] }] }) },
+      chat: { completions: { create: chat } },
+      responses: { create: responsesCreate },
+    } as unknown as ReturnType<typeof getOpenAI>);
+    vi.mocked(getQdrant).mockReturnValue({
+      search: vi.fn().mockResolvedValue([
+        { score: 0.6, payload: { page_content: "fee descriptions", metadata: { filename: "fees.pdf", category: "tuition" } } },
+      ]),
+    } as unknown as ReturnType<typeof getQdrant>);
+
+    const out = await answerQuestion("How much is MSCS tuition per credit?");
+
+    expect(responsesCreate).toHaveBeenCalled();
+    expect(out.viaWeb).toBe(true);
+    expect(out.answer).toContain("per credit");
+    expect(out.sources[0].filename).toBe("SFS");
+  });
+
+  it("does NOT web-fall back when retrieval is confident", async () => {
+    const responsesCreate = vi.fn();
+    const chat = vi.fn()
+      .mockResolvedValueOnce({ choices: [{ message: { content: JSON.stringify({ category: "employment" }) } }] })
+      .mockResolvedValueOnce({ choices: [{ message: { content: "Apply via myOGS." } }] });
+    vi.mocked(getOpenAI).mockReturnValue({
+      embeddings: { create: vi.fn().mockResolvedValue({ data: [{ embedding: [0.1] }] }) },
+      chat: { completions: { create: chat } },
+      responses: { create: responsesCreate },
+    } as unknown as ReturnType<typeof getOpenAI>);
+    vi.mocked(getQdrant).mockReturnValue({
+      search: vi.fn().mockResolvedValue([
+        { score: 0.71, payload: { page_content: "opt", metadata: { filename: "opt.pdf", category: "employment" } } },
+      ]),
+    } as unknown as ReturnType<typeof getQdrant>);
+
+    const out = await answerQuestion("How do I apply for OPT?");
+
+    expect(responsesCreate).not.toHaveBeenCalled();
+    expect(out.viaWeb).toBeFalsy();
+    expect(out.answer).toBe("Apply via myOGS.");
+  });
+});
+
+describe("searchWeb", () => {
+  it("searches northeastern.edu and returns the answer plus deduped url citations", async () => {
+    const create = vi.fn().mockResolvedValue({
+      output_text: "Tuition is about $1,800 per credit hour.",
+      output: [
+        { type: "web_search_call" },
+        {
+          type: "message",
+          content: [
+            {
+              annotations: [
+                { type: "url_citation", url: "https://studentfinance.northeastern.edu/", title: "SFS" },
+                { type: "url_citation", url: "https://studentfinance.northeastern.edu/", title: "dup-same-url" },
+                { type: "url_citation", url: "https://www.khoury.northeastern.edu/", title: "Khoury" },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    vi.mocked(getOpenAI).mockReturnValue({
+      responses: { create },
+    } as unknown as ReturnType<typeof getOpenAI>);
+
+    const out = await searchWeb("How much is MSCS tuition?");
+
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tools: [{ type: "web_search", filters: { allowed_domains: ["northeastern.edu"] } }],
+      }),
+    );
+    expect(out.answer).toContain("per credit");
+    // deduped by URL, in order
+    expect(out.sources.map((s) => s.filename)).toEqual(["SFS", "Khoury"]);
+    expect(out.sources[0].preview).toBe("https://studentfinance.northeastern.edu/");
   });
 });
 

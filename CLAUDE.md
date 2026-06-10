@@ -71,7 +71,9 @@ Base URL: `https://nubanner.neu.edu/StudentRegistrationSsb/ssb`
 
 International-student Q&A feature at `/assistant`, powered by Retrieval-Augmented Generation over Northeastern OGS PDFs. Ported from a former Python/Streamlit app into this Next.js app (single Vercel deployment). **Live: neu-cs-tracker.vercel.app/assistant.**
 
-**Flow (single-shot, stateless):** `POST /api/assistant {question, category?}` → auto-classify the question into one of 8 categories via `gpt-4o-mini` (or use an explicit category; `unknown` → no filter) → embed with `text-embedding-3-small` → category-filtered Qdrant similarity search (k=6) → stuff context into a category-aware prompt → `gpt-4o-mini` answer → return `{category, categoryName, question, answer, sources[]}`.
+**Flow (single-shot, stateless):** `POST /api/assistant {question, category?}` → auto-classify the question into one of 8 categories via `gpt-4o-mini` (or use an explicit category; `unknown` → no filter) → embed with `text-embedding-3-small` → category-filtered Qdrant similarity search (k=6) → stuff context into a category-aware prompt → `gpt-4o-mini` answer → return `{category, categoryName, question, answer, sources[], viaWeb?}`.
+
+**Live web fallback:** when the corpus can't answer, `answerQuestion` falls back to a domain-restricted live web search (OpenAI Responses `web_search` tool, `filters.allowed_domains: ["northeastern.edu"]`, model **`gpt-5-mini`** — the *-mini chat models reject `filters`). Two triggers: (1) the top retrieved chunk scores below `WEB_FALLBACK_FLOOR` (0.5 cosine — no relevant doc), or (2) the answer model returns `{"answered": false}` (a doc was on-topic but didn't contain the figure/policy — `buildPrompt` now asks for that JSON). Web answers come back with `categoryName: "Live web · northeastern.edu"`, `viaWeb: true`, and URL-citation sources (`metadata.source: "web"`); ChatMessage renders those previews as clickable links. Failures degrade gracefully to the corpus answer.
 
 **Files:**
 - `src/lib/rag-categories.ts` — 8 category keys/labels (MUST match `ingestion/ingest.py`), `Category` type, `isCategory()`.
