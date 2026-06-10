@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { CompletedCourse, PlannedCourse } from "@/lib/types";
 import type { ProgramId } from "@/lib/requirements";
 import { PROGRAMS, analyzeGraduation } from "@/lib/requirements";
@@ -71,8 +71,14 @@ export function RequirementChecker() {
     }
   }, []);
 
-  // Persist on any change.
+  // Persist on change. Skip the first run: it fires on mount with the initial
+  // empty state (before hydration commits) and would clobber saved data.
+  const skipFirstPersist = useRef(true);
   useEffect(() => {
+    if (skipFirstPersist.current) {
+      skipFirstPersist.current = false;
+      return;
+    }
     try {
       const payload: PersistedPlanner = { program, completed, planned };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
