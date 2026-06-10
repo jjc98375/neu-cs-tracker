@@ -8,6 +8,7 @@ import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, GraduationCap, T
 import { clsx } from "clsx";
 import { TranscriptImport } from "@/components/TranscriptImport";
 import type { ParsedTranscript } from "@/lib/transcript-parser";
+import { CourseAutocomplete } from "@/components/CourseAutocomplete";
 
 const STORAGE_KEY = "neu-cs-tracker:planner";
 
@@ -264,15 +265,18 @@ export function RequirementChecker() {
 
         {addingCompleted && (
           <div className="border border-slate-200 dark:border-[#243049] rounded-lg p-4 mb-4 bg-slate-50 dark:bg-[#1e2537] grid grid-cols-2 md:grid-cols-3 gap-3">
-            {(["subject", "courseNumber", "title"] as const).map((field) => (
-              <input
-                key={field}
-                className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
-                placeholder={{ subject: "Subject (e.g. CS)", courseNumber: "Number (e.g. 6140)", title: "Title" }[field]}
-                value={newCompleted[field]}
-                onChange={(e) => setNewCompleted({ ...newCompleted, [field]: e.target.value })}
+            <div className="col-span-2 md:col-span-3">
+              <CourseAutocomplete
+                onSelect={(c) =>
+                  setNewCompleted({ ...newCompleted, subject: c.subject, courseNumber: c.courseNumber, title: c.title, credits: c.credits })
+                }
               />
-            ))}
+              {newCompleted.subject && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Selected: <span className="font-mono">{newCompleted.subject} {newCompleted.courseNumber}</span> {newCompleted.title}
+                </p>
+              )}
+            </div>
             <input
               type="number"
               className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
@@ -354,15 +358,18 @@ export function RequirementChecker() {
 
         {addingPlanned && (
           <div className="border border-slate-200 dark:border-[#243049] rounded-lg p-4 mb-4 bg-slate-50 dark:bg-[#1e2537] grid grid-cols-2 md:grid-cols-3 gap-3">
-            {(["subject", "courseNumber", "title"] as const).map((field) => (
-              <input
-                key={field}
-                className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
-                placeholder={{ subject: "Subject (e.g. CS)", courseNumber: "Number (e.g. 7150)", title: "Title" }[field]}
-                value={newPlanned[field]}
-                onChange={(e) => setNewPlanned({ ...newPlanned, [field]: e.target.value })}
+            <div className="col-span-2 md:col-span-3">
+              <CourseAutocomplete
+                onSelect={(c) =>
+                  setNewPlanned({ ...newPlanned, subject: c.subject, courseNumber: c.courseNumber, title: c.title, credits: c.credits })
+                }
               />
-            ))}
+              {newPlanned.subject && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Selected: <span className="font-mono">{newPlanned.subject} {newPlanned.courseNumber}</span> {newPlanned.title}
+                </p>
+              )}
+            </div>
             <input
               type="number"
               className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
