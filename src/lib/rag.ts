@@ -7,6 +7,8 @@ export interface RetrievedChunk {
   content: string;
   filename: string;
   metadata: Record<string, unknown>;
+  /** Cosine similarity from Qdrant; undefined when not provided (e.g. in tests). */
+  score?: number;
 }
 
 export interface SourceDoc {
@@ -21,9 +23,15 @@ export interface AssistantAnswer {
   question: string;
   answer: string;
   sources: SourceDoc[];
+  /** True when the answer came from a live web search instead of the indexed corpus. */
+  viaWeb?: boolean;
 }
 
-/** Mirrors the RetrievalQA prompt template in rag.py. */
+/**
+ * Category-aware answer prompt. Asks the model to BOTH answer and self-report,
+ * via JSON, whether the context actually contained the answer — `answered:false`
+ * is what triggers the live web fallback in answerQuestion().
+ */
 export function buildPrompt(
   categoryLabel: string,
   context: string,
@@ -34,12 +42,15 @@ export function buildPrompt(
     `students, specifically answering questions about ${categoryLabel}.\n\n` +
     `Use ALL relevant information from the context. Be specific and ` +
     `comprehensive, include policies, dates, amounts, and procedures when ` +
-    `they appear. Synthesize across documents. If the context doesn't ` +
-    `cover the question, say so plainly — don't invent details about ` +
+    `they appear. Synthesize across documents. Never invent details about ` +
     `${categoryLabel}.\n\n` +
+    `Respond as JSON: {"answered": boolean, "answer": string}. Set ` +
+    `"answered" to false when the context does NOT contain the specific ` +
+    `information the question asks for (e.g. a figure, rate, or policy that ` +
+    `simply isn't present) — even if the context is on the same topic — and ` +
+    `briefly say so in "answer". Otherwise set it to true.\n\n` +
     `Context: ${context}\n\n` +
-    `Question: ${question}\n\n` +
-    `Answer:`
+    `Question: ${question}`
   );
 }
 
@@ -68,6 +79,29 @@ const TOP_K = 6;
 // while the OPT doc scores ~0.71 unfiltered). Below the floor we retry without the
 // filter so a wrong category can't hide an otherwise-strong document.
 const SCORE_FLOOR = 0.5;
+// When even the best (unfiltered) retrieved chunk scores below this floor, the corpus
+// has no good answer (measured: "MSCS tuition" tops out ~0.42 vs ~0.7 for covered
+// topics). We then fall back to a live, domain-restricted web search.
+const WEB_FALLBACK_FLOOR = 0.5;
+// Domain `filters` on the web_search tool are rejected by the *-mini chat models
+// (gpt-4o-mini/gpt-4.1-mini → 400); gpt-5-mini is the cheapest model that supports them.
+const WEB_SEARCH_MODEL = "gpt-5-mini";
+const WEB_ALLOWED_DOMAINS = ["northeastern.edu"];
+const WEB_CATEGORY_LABEL = "Live web · northeastern.edu";
+
+// Minimal shapes for reading the Responses API web-search output (SDK types are broad).
+interface UrlCitation {
+  type: string;
+  url: string;
+  title?: string;
+}
+interface WebOutputPart {
+  annotations?: UrlCitation[];
+}
+interface WebOutputItem {
+  type: string;
+  content?: WebOutputPart[];
+}
 
 interface ScoredResult {
   score?: number;
@@ -88,6 +122,7 @@ function mapResults(results: ScoredResult[]): RetrievedChunk[] {
       content: payload.page_content ?? "",
       filename: String(metadata.filename ?? "Unknown"),
       metadata,
+      score: r.score,
     };
   });
 }
@@ -173,8 +208,50 @@ export async function retrieve(
 }
 
 /**
+ * Live fallback: when the corpus has no good answer, search the open web through
+ * OpenAI's Responses web-search tool, restricted to northeastern.edu, and return
+ * the synthesized answer plus its (deduped) URL citations as sources.
+ */
+export async function searchWeb(
+  question: string,
+): Promise<{ answer: string; sources: SourceDoc[] }> {
+  const res = await getOpenAI().responses.create({
+    model: WEB_SEARCH_MODEL,
+    tools: [{ type: "web_search", filters: { allowed_domains: WEB_ALLOWED_DOMAINS } }],
+    input:
+      `You are helping a Northeastern University international student. Answer the ` +
+      `question using current, official Northeastern information. Be specific and ` +
+      `cite figures, dates, and procedures when available. If you cannot find it, ` +
+      `say so plainly.\n\nQuestion: ${question}`,
+  } as Parameters<ReturnType<typeof getOpenAI>["responses"]["create"]>[0]);
+
+  const answer = (res as { output_text?: string }).output_text ?? "";
+
+  const sources: SourceDoc[] = [];
+  const seen = new Set<string>();
+  const output = ((res as { output?: WebOutputItem[] }).output ?? []);
+  for (const item of output) {
+    if (item.type !== "message") continue;
+    for (const part of item.content ?? []) {
+      for (const ann of part.annotations ?? []) {
+        if (ann.type === "url_citation" && ann.url && !seen.has(ann.url)) {
+          seen.add(ann.url);
+          sources.push({
+            filename: ann.title || ann.url,
+            preview: ann.url,
+            metadata: { url: ann.url, source: "web" },
+          });
+        }
+      }
+    }
+  }
+  return { answer, sources };
+}
+
+/**
  * Single-shot RAG: resolve category (auto-classify if absent) → retrieve →
- * build prompt → generate answer → dedupe sources.
+ * build prompt → generate answer → dedupe sources. When the indexed corpus has
+ * no confident match, fall back to a live web search (northeastern.edu).
  */
 export async function answerQuestion(
   question: string,
@@ -183,8 +260,34 @@ export async function answerQuestion(
   const resolved: Category | "unknown" = category ?? (await classifyCategory(question));
 
   const chunks = await retrieve(question, resolved);
-  const context = chunks.map((c) => c.content).join("\n\n");
 
+  // Helper: run the live web fallback, returning a full answer or null if it can't help.
+  const webFallback = async (): Promise<AssistantAnswer | null> => {
+    try {
+      const web = await searchWeb(question);
+      if (!web.answer.trim()) return null;
+      return {
+        category: resolved,
+        categoryName: WEB_CATEGORY_LABEL,
+        question,
+        answer: web.answer,
+        sources: web.sources,
+        viaWeb: true,
+      };
+    } catch {
+      return null; // web search unavailable — degrade to the corpus answer
+    }
+  };
+
+  // Trigger 1 — no confident document at all (best chunk scores below the floor).
+  // Guarded on a defined score so unit tests with score-less mocks keep the RAG path.
+  const topScore = chunks[0]?.score;
+  if (topScore !== undefined && topScore < WEB_FALLBACK_FLOOR) {
+    const web = await webFallback();
+    if (web) return web;
+  }
+
+  const context = chunks.map((c) => c.content).join("\n\n");
   const label =
     resolved === "unknown"
       ? "Northeastern international student topics"
@@ -193,14 +296,42 @@ export async function answerQuestion(
   const completion = await getOpenAI().chat.completions.create({
     model: ANSWER_MODEL,
     temperature: 0.2,
+    response_format: { type: "json_object" },
     messages: [{ role: "user", content: buildPrompt(label, context, question) }],
   });
+  const { answer, answered } = parseGroundedAnswer(
+    completion.choices[0]?.message?.content ?? "",
+  );
+
+  // Trigger 2 — a doc was retrieved but the model says the context doesn't actually
+  // contain the answer (on-topic but missing the figure/policy). Fall back to web.
+  if (!answered) {
+    const web = await webFallback();
+    if (web) return web;
+  }
 
   return {
     category: resolved,
     categoryName: resolved === "unknown" ? "All categories" : AVAILABLE_CATEGORIES[resolved],
     question,
-    answer: completion.choices[0]?.message?.content ?? "",
+    answer,
     sources: dedupeSources(chunks),
   };
+}
+
+/**
+ * Parse the answer model's JSON ({answered, answer}). Falls back gracefully to
+ * treating the raw text as a grounded answer when it isn't valid JSON (keeps
+ * older/plain responses — and unit-test mocks — working).
+ */
+export function parseGroundedAnswer(raw: string): { answer: string; answered: boolean } {
+  try {
+    const parsed = JSON.parse(raw) as { answer?: unknown; answered?: unknown };
+    if (typeof parsed.answer === "string") {
+      return { answer: parsed.answer, answered: parsed.answered !== false };
+    }
+  } catch {
+    /* not JSON — treat as a plain grounded answer */
+  }
+  return { answer: raw, answered: true };
 }

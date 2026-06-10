@@ -48,7 +48,18 @@ export function ChatMessage({ entry }: { entry: ChatEntry }) {
                     {entry.sources.map((s) => (
                       <li key={s.filename} className="text-xs">
                         <span className="font-medium">{s.filename}</span>
-                        <span className="block text-slate-400 truncate">{s.preview}</span>
+                        {/^https?:\/\//.test(s.preview) ? (
+                          <a
+                            href={s.preview}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block text-blue-500 hover:underline truncate"
+                          >
+                            {s.preview}
+                          </a>
+                        ) : (
+                          <span className="block text-slate-400 truncate">{s.preview}</span>
+                        )}
                       </li>
                     ))}
                   </ul>
