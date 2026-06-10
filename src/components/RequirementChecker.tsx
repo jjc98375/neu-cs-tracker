@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { CompletedCourse, PlannedCourse } from "@/lib/types";
 import type { ProgramId } from "@/lib/requirements";
 import { PROGRAMS, analyzeGraduation } from "@/lib/requirements";
-import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, GraduationCap, TrendingUp } from "lucide-react";
+import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, Pencil, GraduationCap, TrendingUp } from "lucide-react";
 import { clsx } from "clsx";
+import { TranscriptImport } from "@/components/TranscriptImport";
+import type { ParsedTranscript } from "@/lib/transcript-parser";
+import { CourseAutocomplete } from "@/components/CourseAutocomplete";
+
+const STORAGE_KEY = "neu-cs-tracker:planner";
+
+interface PersistedPlanner {
+  program: ProgramId;
+  completed: CompletedCourse[];
+  planned: PlannedCourse[];
+}
 
 const EMPTY_COMPLETED: CompletedCourse = {
   subject: "", courseNumber: "", title: "", credits: 4, term: "", grade: "",
@@ -38,6 +49,141 @@ const CATEGORY_COLORS: Record<string, string> = {
   Math:         "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800/40 text-yellow-700 dark:text-yellow-300",
 };
 
+// ─── EditableCourseRow subcomponent ──────────────────────────────────────────
+
+interface EditableCourseRowProps {
+  course: CompletedCourse | PlannedCourse;
+  type: "completed" | "planned";
+  termOptions: { code: string; label: string }[];
+  onSave: (updated: CompletedCourse | PlannedCourse) => void;
+  onDelete: () => void;
+}
+
+export function EditableCourseRow({ course, type, termOptions, onSave, onDelete }: EditableCourseRowProps) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<CompletedCourse>({ ...(course as CompletedCourse) });
+
+  function handleEdit() {
+    setDraft({ ...(course as CompletedCourse) });
+    setEditing(true);
+  }
+
+  function handleSave() {
+    if (!draft.subject || !draft.courseNumber || !draft.term) return;
+    if (type === "planned") {
+      const { grade: _grade, ...planned } = draft;
+      onSave(planned as PlannedCourse);
+    } else {
+      onSave({ ...draft });
+    }
+    setEditing(false);
+  }
+
+  function handleCancel() {
+    setEditing(false);
+  }
+
+  const inputCls = "border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100";
+
+  if (editing) {
+    return (
+      <div className="border border-slate-200 dark:border-[#243049] rounded-lg p-3 mb-1 bg-slate-50 dark:bg-[#1e2537] grid grid-cols-2 md:grid-cols-3 gap-2">
+        <input
+          className={inputCls}
+          placeholder="Subject"
+          value={draft.subject}
+          onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
+        />
+        <input
+          className={inputCls}
+          placeholder="Course #"
+          value={draft.courseNumber}
+          onChange={(e) => setDraft({ ...draft, courseNumber: e.target.value })}
+        />
+        <input
+          className={inputCls}
+          placeholder="Title"
+          value={draft.title}
+          onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+        />
+        <input
+          type="number"
+          className={inputCls}
+          placeholder="Credits"
+          value={draft.credits}
+          onChange={(e) => setDraft({ ...draft, credits: parseInt(e.target.value) || 0 })}
+        />
+        <select
+          className={inputCls}
+          value={draft.term}
+          onChange={(e) => setDraft({ ...draft, term: e.target.value })}
+        >
+          <option value="">Select term</option>
+          {termOptions.map((t) => <option key={t.code} value={t.code}>{t.label}</option>)}
+        </select>
+        {type === "completed" && (
+          <input
+            className={inputCls}
+            placeholder="Grade (optional)"
+            value={draft.grade ?? ""}
+            onChange={(e) => setDraft({ ...draft, grade: e.target.value })}
+          />
+        )}
+        <div className="col-span-2 md:col-span-3 flex gap-2">
+          <button
+            className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-blue-700"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+          <button
+            className="text-slate-500 px-3 py-1.5 rounded text-sm hover:bg-slate-100 dark:hover:bg-[#243049]"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const isCompleted = type === "completed";
+  const c = course as CompletedCourse;
+
+  return (
+    <div className={`flex items-center gap-3 p-2 rounded-lg text-sm border ${
+      isCompleted
+        ? "bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/30"
+        : "bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30"
+    }`}>
+      {isCompleted
+        ? <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+        : <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
+      }
+      <span className="font-mono font-semibold text-red-600 dark:text-red-400">{c.subject} {c.courseNumber}</span>
+      <span className="flex-1 text-slate-700 dark:text-slate-200 truncate">{c.title}</span>
+      <span className="text-slate-400 text-xs">{c.credits} cr</span>
+      {isCompleted && c.grade && <span className="text-slate-500 dark:text-slate-400 text-xs">{c.grade}</span>}
+      <button
+        aria-label={`Edit ${c.subject} ${c.courseNumber}`}
+        onClick={handleEdit}
+        className="text-slate-300 dark:text-slate-600 hover:text-blue-400"
+      >
+        <Pencil className="w-4 h-4" />
+      </button>
+      <button
+        aria-label={`Delete ${c.subject} ${c.courseNumber}`}
+        onClick={onDelete}
+        className="text-slate-300 dark:text-slate-600 hover:text-red-400"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function RequirementChecker() {
   const [program, setProgram] = useState<ProgramId>("MSCS");
   const [completed, setCompleted] = useState<CompletedCourse[]>([]);
@@ -46,6 +192,42 @@ export function RequirementChecker() {
   const [addingPlanned, setAddingPlanned] = useState(false);
   const [newCompleted, setNewCompleted] = useState<CompletedCourse>({ ...EMPTY_COMPLETED });
   const [newPlanned, setNewPlanned] = useState<PlannedCourse>({ ...EMPTY_PLANNED });
+
+  // Hydrate once on mount (client-only; guards SSR).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as PersistedPlanner;
+      if (saved.program) setProgram(saved.program);
+      if (Array.isArray(saved.completed)) setCompleted(saved.completed);
+      if (Array.isArray(saved.planned)) setPlanned(saved.planned);
+    } catch {
+      /* ignore corrupt/unavailable storage */
+    }
+  }, []);
+
+  // Persist on change. Skip the first run: it fires on mount with the initial
+  // empty state (before hydration commits) and would clobber saved data.
+  const skipFirstPersist = useRef(true);
+  useEffect(() => {
+    if (skipFirstPersist.current) {
+      skipFirstPersist.current = false;
+      return;
+    }
+    try {
+      const payload: PersistedPlanner = { program, completed, planned };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      /* storage full/unavailable — degrade to session-only */
+    }
+  }, [program, completed, planned]);
+
+  function handleImport(result: ParsedTranscript) {
+    if (result.program) setProgram(result.program);
+    setCompleted(result.completed);
+    setPlanned(result.inProgress);
+  }
 
   const analysis = analyzeGraduation(program, completed, planned);
   const prog = PROGRAMS[program];
@@ -59,6 +241,7 @@ export function RequirementChecker() {
 
   return (
     <div className="space-y-6">
+      <TranscriptImport onImport={handleImport} />
       {/* Program selector */}
       <div className="flex flex-wrap gap-3">
         {(Object.keys(PROGRAMS) as ProgramId[]).map((pid) => (
@@ -217,15 +400,18 @@ export function RequirementChecker() {
 
         {addingCompleted && (
           <div className="border border-slate-200 dark:border-[#243049] rounded-lg p-4 mb-4 bg-slate-50 dark:bg-[#1e2537] grid grid-cols-2 md:grid-cols-3 gap-3">
-            {(["subject", "courseNumber", "title"] as const).map((field) => (
-              <input
-                key={field}
-                className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
-                placeholder={{ subject: "Subject (e.g. CS)", courseNumber: "Number (e.g. 6140)", title: "Title" }[field]}
-                value={newCompleted[field]}
-                onChange={(e) => setNewCompleted({ ...newCompleted, [field]: e.target.value })}
+            <div className="col-span-2 md:col-span-3">
+              <CourseAutocomplete
+                onSelect={(c) =>
+                  setNewCompleted({ ...newCompleted, subject: c.subject, courseNumber: c.courseNumber, title: c.title, credits: c.credits })
+                }
               />
-            ))}
+              {newCompleted.subject && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Selected: <span className="font-mono">{newCompleted.subject} {newCompleted.courseNumber}</span> {newCompleted.title}
+                </p>
+              )}
+            </div>
             <input
               type="number"
               className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
@@ -275,19 +461,14 @@ export function RequirementChecker() {
         ) : (
           <div className="space-y-1">
             {completed.map((c, i) => (
-              <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 text-sm">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                <span className="font-mono font-semibold text-red-600 dark:text-red-400">{c.subject} {c.courseNumber}</span>
-                <span className="flex-1 text-slate-700 dark:text-slate-200 truncate">{c.title}</span>
-                <span className="text-slate-400 text-xs">{c.credits} cr</span>
-                {c.grade && <span className="text-slate-500 dark:text-slate-400 text-xs">{c.grade}</span>}
-                <button
-                  onClick={() => setCompleted(completed.filter((_, j) => j !== i))}
-                  className="text-slate-300 dark:text-slate-600 hover:text-red-400"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+              <EditableCourseRow
+                key={i}
+                course={c}
+                type="completed"
+                termOptions={TERM_OPTIONS}
+                onSave={(updated) => setCompleted(completed.map((x, j) => j === i ? updated as CompletedCourse : x))}
+                onDelete={() => setCompleted(completed.filter((_, j) => j !== i))}
+              />
             ))}
           </div>
         )}
@@ -307,15 +488,18 @@ export function RequirementChecker() {
 
         {addingPlanned && (
           <div className="border border-slate-200 dark:border-[#243049] rounded-lg p-4 mb-4 bg-slate-50 dark:bg-[#1e2537] grid grid-cols-2 md:grid-cols-3 gap-3">
-            {(["subject", "courseNumber", "title"] as const).map((field) => (
-              <input
-                key={field}
-                className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
-                placeholder={{ subject: "Subject (e.g. CS)", courseNumber: "Number (e.g. 7150)", title: "Title" }[field]}
-                value={newPlanned[field]}
-                onChange={(e) => setNewPlanned({ ...newPlanned, [field]: e.target.value })}
+            <div className="col-span-2 md:col-span-3">
+              <CourseAutocomplete
+                onSelect={(c) =>
+                  setNewPlanned({ ...newPlanned, subject: c.subject, courseNumber: c.courseNumber, title: c.title, credits: c.credits })
+                }
               />
-            ))}
+              {newPlanned.subject && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Selected: <span className="font-mono">{newPlanned.subject} {newPlanned.courseNumber}</span> {newPlanned.title}
+                </p>
+              )}
+            </div>
             <input
               type="number"
               className="border border-slate-300 dark:border-[#243049] rounded px-2 py-1.5 text-sm bg-white dark:bg-[#1e2537] text-slate-900 dark:text-slate-100"
@@ -359,18 +543,14 @@ export function RequirementChecker() {
         ) : (
           <div className="space-y-1">
             {planned.map((c, i) => (
-              <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 text-sm">
-                <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                <span className="font-mono font-semibold text-red-600 dark:text-red-400">{c.subject} {c.courseNumber}</span>
-                <span className="flex-1 text-slate-700 dark:text-slate-200 truncate">{c.title}</span>
-                <span className="text-slate-400 text-xs">{c.credits} cr</span>
-                <button
-                  onClick={() => setPlanned(planned.filter((_, j) => j !== i))}
-                  className="text-slate-300 dark:text-slate-600 hover:text-red-400"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+              <EditableCourseRow
+                key={i}
+                course={c}
+                type="planned"
+                termOptions={TERM_OPTIONS}
+                onSave={(updated) => setPlanned(planned.map((x, j) => j === i ? updated as PlannedCourse : x))}
+                onDelete={() => setPlanned(planned.filter((_, j) => j !== i))}
+              />
             ))}
           </div>
         )}

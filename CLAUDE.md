@@ -67,6 +67,59 @@ Base URL: `https://nubanner.neu.edu/StudentRegistrationSsb/ssb`
 
 `analyzeGraduation(programId, completed, planned)` returns credit totals, requirement statuses, missing courses, on-track boolean, and projected graduation term.
 
+## Transcript Import (auto-fill the planner)
+
+Students upload their **NEU Unofficial Academic Transcript PDF** on `/requirements`
+and the planner auto-fills completed + in-progress courses and the program.
+**100% client-side** — the PDF is parsed in the browser and nothing is uploaded to a
+server; results persist only in `localStorage` (key `neu-cs-tracker:planner`).
+
+**Flow:** `TranscriptImport` → `extractLines(file)` (pdf.js) → `parseTranscript(lines)` →
+`RequirementChecker` sets completed/planned/program (auto-fill, no review gate).
+
+**Files:**
+- `src/lib/transcript-parser.ts` — **pure** `parseTranscript(lines: string[]): ParsedTranscript`
+  (+ `termToCode`, `programToId`, `isEarnedGrade`, `parseGradedRow`, `parseInProgressRow`).
+  No I/O, fully unit-tested.
+- `src/lib/pdf-text.ts` — `"use client"` pdf.js adapter; `extractLines(file)` groups text
+  items into visual lines by y-coordinate. Only module importing `pdfjs-dist`.
+- `src/components/TranscriptImport.tsx` — upload UI; injectable `extractLinesFn` for tests.
+- `RequirementChecker.tsx` — renders the importer, hydrates/persists planner state to localStorage.
+
+**Parser gotcha (do not regress):** pdf.js extraction of the real transcript splits a
+**long course title across three rows** — a fragment ABOVE the code row, a *titleless*
+code row (`CS 5010 GR A- 4.000 14.668`), and a fragment BELOW. Short titles stay inline
+(`CS 6140 GR Machine Learning A 4.000 16.000`). The column header wraps into three rows
+(`Credit Quality…`, `Subject Course Level…`, `Hours Points…`) and `about:blank N/N` page
+footers appear. `parseTranscript` reconstructs titles from adjacent rows and ignores the
+noise. The test fixture in `__tests__/lib/transcript-parser.test.ts` is the **byte-exact**
+`extractLines` output on a real transcript — keep it that way. Completed courses come from
+`INSTITUTION CREDIT` (graded; not-earned grades W/I/IP/NF/U/L/X skipped); in-progress from
+`COURSE(S) IN PROGRESS`. Term mapping: Spring=10, Summer=50, Fall=30 (e.g. Fall 2024 → 202430).
+
+Design spec + plan: `docs/superpowers/specs/2026-06-06-transcript-import-design.md`,
+`docs/superpowers/plans/2026-06-06-transcript-import.md`.
+
+### Course autocomplete + inline edit
+
+Adding a planner course uses a **searchable typeahead** instead of raw text fields, and
+added courses are **editable in place**.
+- `src/lib/course-catalog.ts` — pure. `STATIC_CATALOG` (deduped from `PROGRAMS` in
+  `requirements.ts`, ~70 courses), `searchCatalog(query, limit?)` (matches course code or
+  title tokens), `parseCourseCode(query)`. Instant, offline.
+- `src/lib/course-lookup.ts` — client. `lookupBannerCourse(subject, number)`: latest term
+  via `/api/terms` (cached) → `/api/courses` → `{title, credits}`. Best-effort **fallback**
+  for codes not in the curated list; returns `null` on any failure (never throws).
+- `src/components/CourseAutocomplete.tsx` — typeahead: filters `STATIC_CATALOG` synchronously;
+  if no static hit and the query is a course code, debounces `lookupBannerCourse` (injectable
+  `lookupFn` for tests). `onSelect` fills subject/number/title/credits.
+- `RequirementChecker.tsx` — add forms use `CourseAutocomplete`; the `EditableCourseRow`
+  subcomponent renders each completed/planned row with a pencil (edit) + trash (delete);
+  edits write back by index and persist via the existing localStorage effect.
+
+Spec + plan: `docs/superpowers/specs/2026-06-10-course-autocomplete-edit-design.md`,
+`docs/superpowers/plans/2026-06-10-course-autocomplete-edit.md`.
+
 ## Assistant (RAG chatbot)
 
 International-student Q&A feature at `/assistant`, powered by Retrieval-Augmented Generation over Northeastern OGS PDFs. Ported from a former Python/Streamlit app into this Next.js app (single Vercel deployment). **Live: neu-cs-tracker.vercel.app/assistant.**
