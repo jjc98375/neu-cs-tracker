@@ -100,6 +100,26 @@ noise. The test fixture in `__tests__/lib/transcript-parser.test.ts` is the **by
 Design spec + plan: `docs/superpowers/specs/2026-06-06-transcript-import-design.md`,
 `docs/superpowers/plans/2026-06-06-transcript-import.md`.
 
+### Course autocomplete + inline edit
+
+Adding a planner course uses a **searchable typeahead** instead of raw text fields, and
+added courses are **editable in place**.
+- `src/lib/course-catalog.ts` — pure. `STATIC_CATALOG` (deduped from `PROGRAMS` in
+  `requirements.ts`, ~70 courses), `searchCatalog(query, limit?)` (matches course code or
+  title tokens), `parseCourseCode(query)`. Instant, offline.
+- `src/lib/course-lookup.ts` — client. `lookupBannerCourse(subject, number)`: latest term
+  via `/api/terms` (cached) → `/api/courses` → `{title, credits}`. Best-effort **fallback**
+  for codes not in the curated list; returns `null` on any failure (never throws).
+- `src/components/CourseAutocomplete.tsx` — typeahead: filters `STATIC_CATALOG` synchronously;
+  if no static hit and the query is a course code, debounces `lookupBannerCourse` (injectable
+  `lookupFn` for tests). `onSelect` fills subject/number/title/credits.
+- `RequirementChecker.tsx` — add forms use `CourseAutocomplete`; the `EditableCourseRow`
+  subcomponent renders each completed/planned row with a pencil (edit) + trash (delete);
+  edits write back by index and persist via the existing localStorage effect.
+
+Spec + plan: `docs/superpowers/specs/2026-06-10-course-autocomplete-edit-design.md`,
+`docs/superpowers/plans/2026-06-10-course-autocomplete-edit.md`.
+
 ## Assistant (RAG chatbot)
 
 International-student Q&A feature at `/assistant`, powered by Retrieval-Augmented Generation over Northeastern OGS PDFs. Ported from a former Python/Streamlit app into this Next.js app (single Vercel deployment). **Live: neu-cs-tracker.vercel.app/assistant.**
