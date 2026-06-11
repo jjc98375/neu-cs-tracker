@@ -5,7 +5,47 @@ import {
   termLabel,
   getTerms,
   searchCourses,
+  getCourseDescription,
+  formatCredits,
 } from "@/lib/banner-api";
+
+describe("formatCredits", () => {
+  const credits = (
+    creditHours: number | null,
+    creditHourLow: number | null,
+    creditHourHigh: number | null
+  ) => formatCredits({ creditHours, creditHourLow, creditHourHigh });
+
+  it("uses creditHours when set", () => {
+    expect(credits(4, null, null)).toBe("4");
+    expect(credits(4, 1, 4)).toBe("4"); // creditHours wins over range
+  });
+
+  it("falls back to creditHourLow when creditHours is null (CS 5001 case)", () => {
+    expect(credits(null, 4, null)).toBe("4");
+  });
+
+  it("falls back to creditHourHigh when only it is set", () => {
+    expect(credits(null, null, 3)).toBe("3");
+  });
+
+  it("renders a range when low and high differ", () => {
+    expect(credits(null, 1, 4)).toBe("1–4");
+  });
+
+  it("collapses an equal low/high to a single value", () => {
+    expect(credits(null, 4, 4)).toBe("4");
+  });
+
+  it("renders 0 credits rather than '?'", () => {
+    expect(credits(0, null, null)).toBe("0");
+    expect(credits(null, 0, null)).toBe("0");
+  });
+
+  it("returns '?' only when no credit value exists", () => {
+    expect(credits(null, null, null)).toBe("?");
+  });
+});
 
 // ──────────────────────────────────────────────────────────────────────────────
 // deriveSummerSession
@@ -324,5 +364,66 @@ describe("searchCourses", () => {
     } as Response);
 
     await expect(searchCourses({ term: "202430" })).rejects.toThrow("500");
+  });
+});
+
+describe("getCourseDescription", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const sessionRes = {
+    ok: true,
+    headers: { getSetCookie: () => ["JSESSIONID=xyz; Path=/"] },
+  } as unknown as Response;
+  const htmlRes = (html: string) =>
+    ({ ok: true, text: async () => html } as unknown as Response);
+  const NO_DESC =
+    '<section aria-labelledby="courseDescription">No course description is available.</section>';
+
+  it("returns the section-level description when present", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(sessionRes)
+      .mockResolvedValueOnce(htmlRes("<section>A real description.</section>"));
+
+    const desc = await getCourseDescription("17238", "202630", "CS", "5001");
+    expect(desc).toBe("A real description.");
+    // session POST + one GET only — no catalog fallback needed
+    expect(vi.mocked(fetch).mock.calls).toHaveLength(2);
+  });
+
+  it("falls back to the catalog description when the section has none", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(sessionRes)
+      .mockResolvedValueOnce(htmlRes(NO_DESC))
+      .mockResolvedValueOnce(htmlRes("<section>Catalog-level text.</section>"));
+
+    const desc = await getCourseDescription("17238", "202630", "CS", "5001");
+    expect(desc).toBe("Catalog-level text.");
+    const catalogCall = vi.mocked(fetch).mock.calls[2][0] as string;
+    expect(catalogCall).toContain("subjectCode=CS");
+    expect(catalogCall).toContain("courseNumber=5001");
+    expect(catalogCall).not.toContain("courseReferenceNumber");
+  });
+
+  it("returns null when neither section nor catalog has a description", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(sessionRes)
+      .mockResolvedValueOnce(htmlRes(NO_DESC))
+      .mockResolvedValueOnce(htmlRes(NO_DESC));
+
+    expect(await getCourseDescription("17238", "202630", "CS", "5001")).toBeNull();
+  });
+
+  it("does not attempt the catalog fallback without subject/courseNumber", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(sessionRes)
+      .mockResolvedValueOnce(htmlRes(NO_DESC));
+
+    expect(await getCourseDescription("17238", "202630")).toBeNull();
+    expect(vi.mocked(fetch).mock.calls).toHaveLength(2);
   });
 });

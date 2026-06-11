@@ -3,6 +3,7 @@
 import React from "react";
 import type { CourseSection, SummerSession } from "@/lib/types";
 import { SessionBadge } from "./SessionBadge";
+import { formatCredits } from "@/lib/banner-api";
 import { ChevronDown, ChevronUp, Users, Clock, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -38,7 +39,11 @@ export function CourseTable({ courses, loading }: Props) {
     // Fetch description
     if (!(expanded in descriptions)) {
       setLoadingDesc((prev) => ({ ...prev, [expanded]: true }));
-      fetch(`/api/course-description?crn=${expanded}&term=${course.term}`)
+      fetch(
+        `/api/course-description?crn=${expanded}&term=${course.term}&subject=${encodeURIComponent(
+          course.subject
+        )}&courseNumber=${encodeURIComponent(course.courseNumber)}`
+      )
         .then((r) => r.json())
         .then((data) => {
           setDescriptions((prev) => ({ ...prev, [expanded]: data.description ?? null }));
@@ -293,7 +298,7 @@ export function CourseTable({ courses, loading }: Props) {
                           </div>
                         </div>
                         <div className="mt-2 text-slate-500 dark:text-slate-400 text-xs">
-                          {c.creditHours ?? c.creditHourHigh ?? "?"} credit(s) · {c.scheduleTypeDescription}
+                          {formatCredits(c)} credit(s) · {c.scheduleTypeDescription}
                         </div>
                         <div className="mt-1 text-slate-500 dark:text-slate-400 text-xs">
                           Part of term: <span className="font-mono">{c.partOfTerm || "1"}</span>

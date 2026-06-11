@@ -99,6 +99,32 @@ export function termLabel(termCode: string): string {
   return `${map[suffix] ?? suffix} ${year}`;
 }
 
+/**
+ * Format a section's credit hours for display.
+ *
+ * Banner reports credits inconsistently: fixed-credit sections use `creditHours`,
+ * but many (e.g. CS 5001) leave that null and put the value in `creditHourLow`.
+ * Variable-credit sections set both `creditHourLow` and `creditHourHigh`.
+ * Returns "?" only when no credit value exists at all.
+ */
+export function formatCredits(section: {
+  creditHours: number | null;
+  creditHourLow: number | null;
+  creditHourHigh: number | null;
+}): string {
+  const { creditHours, creditHourLow, creditHourHigh } = section;
+  if (creditHours != null) return String(creditHours);
+  if (
+    creditHourLow != null &&
+    creditHourHigh != null &&
+    creditHourHigh !== creditHourLow
+  ) {
+    return `${creditHourLow}–${creditHourHigh}`;
+  }
+  const single = creditHourLow ?? creditHourHigh;
+  return single != null ? String(single) : "?";
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Banner API — server-side only (uses fetch with cookies)
 // ──────────────────────────────────────────────────────────────────────────────
@@ -186,21 +212,8 @@ export async function getPartsOfTerm(termCode: string) {
   return res.json();
 }
 
-/**
- * Fetch course description from Banner catalog.
- * Banner returns HTML (not JSON), so we parse the text content.
- */
-export async function getCourseDescription(
-  crn: string,
-  term: string
-): Promise<string | null> {
-  const cookies = await establishSession(term);
-  const res = await bannerGet(
-    `/courseSearchResults/getCourseDescription?term=${term}&courseReferenceNumber=${crn}`,
-    { cookieJar: cookies }
-  );
-  const html = await res.text();
-  // Strip HTML tags to get plain text description
+/** Strip HTML tags from Banner's description response; null if empty/placeholder. */
+function parseDescriptionHtml(html: string): string | null {
   const text = html
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
@@ -209,6 +222,43 @@ export async function getCourseDescription(
     return null;
   }
   return text;
+}
+
+/**
+ * Fetch course description from Banner. Banner returns HTML (not JSON).
+ *
+ * Tries the section-level endpoint first (by CRN). Many sections — especially
+ * regional-campus or special-topics sections — have no section-level text, so
+ * when `subject`/`courseNumber` are provided we fall back to the catalog-level
+ * description (by subject + course number), which is populated course-wide.
+ */
+export async function getCourseDescription(
+  crn: string,
+  term: string,
+  subject?: string,
+  courseNumber?: string
+): Promise<string | null> {
+  const cookies = await establishSession(term);
+
+  const sectionRes = await bannerGet(
+    `/courseSearchResults/getCourseDescription?term=${term}&courseReferenceNumber=${crn}`,
+    { cookieJar: cookies }
+  );
+  const sectionDesc = parseDescriptionHtml(await sectionRes.text());
+  if (sectionDesc) return sectionDesc;
+
+  // Fall back to the course-level catalog description.
+  if (subject && courseNumber) {
+    const catalogRes = await bannerGet(
+      `/courseSearchResults/getCourseDescription?term=${term}&subjectCode=${encodeURIComponent(
+        subject
+      )}&courseNumber=${encodeURIComponent(courseNumber)}`,
+      { cookieJar: cookies }
+    );
+    return parseDescriptionHtml(await catalogRes.text());
+  }
+
+  return null;
 }
 
 /**
