@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import useSWR from "swr";
 import type { CourseSection, Term } from "@/lib/types";
 import type { Filters } from "@/components/FilterPanel";
@@ -80,25 +79,9 @@ export default function CoursesPage() {
   }
 
   return (
-    <div>
-      <header className="mb-6">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-red-600 dark:text-red-400">
-          Course Browser
-        </p>
-        <h1
-          className="text-2xl font-normal text-slate-900 dark:text-slate-100 md:text-3xl"
-          style={{ letterSpacing: "-0.02em" }}
-        >
-          Find your courses
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Search every Northeastern section by term, campus, and summer session.
-        </p>
-      </header>
-
-      <div className="flex gap-4 h-full">
-        {/* Sidebar */}
-        <aside className="w-64 flex-shrink-0">
+    <div className="flex gap-4 h-full">
+      {/* Sidebar */}
+      <aside className="w-64 flex-shrink-0">
         <FilterPanel
           filters={filters}
           onChange={setFilters}
@@ -135,22 +118,13 @@ export default function CoursesPage() {
 
         {!queryKey ? (
           <div className="flex flex-col items-center justify-center h-64 text-slate-400 space-y-3">
-            <Image
-              src="/images/husky.jpg"
-              alt=""
-              width={80}
-              height={80}
-              className="h-20 w-20 rounded-full object-cover opacity-90 ring-2 ring-red-500/40"
-            />
-            <p className="text-sm">
-              Pick a term and hit Search — your Husky&apos;s ready to fetch.
-            </p>
+            <Search className="w-10 h-10 opacity-40" />
+            <p className="text-sm">Select a term and click Search to load courses.</p>
           </div>
         ) : (
           <CourseTable courses={filtered} loading={isLoading} />
         )}
-        </main>
-      </div>
+      </main>
     </div>
   );
 }

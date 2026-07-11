@@ -1,1 +1,3 @@
-ingestion/
+# Local Python venv / artifacts (Project 1 has no ingestion pipeline)
+.claude/
+data/

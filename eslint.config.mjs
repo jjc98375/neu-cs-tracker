@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local, non-source artifacts that must never be linted.
+    "ingestion/**",
+    ".claude/**",
+    "data/**",
   ]),
 ]);
 

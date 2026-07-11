@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import { SiteChrome } from "@/components/SiteChrome";
+import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import Image from "next/image";
+import { ThemeProvider, ThemeToggle } from "@/components/ThemeProvider";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
 });
 
 const geistMono = Geist_Mono({
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NEU Course Planner",
+  title: "NEU Grad Planner",
   description: "Northeastern University course browser and graduation planner",
 };
 
@@ -26,13 +26,42 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${geistMono.variable} scroll-smooth`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased bg-slate-100 dark:bg-[#0d1117] text-slate-900 dark:text-slate-100 min-h-screen">
         <ThemeProvider>
-          <SiteChrome>{children}</SiteChrome>
+          {/* Top nav */}
+          <header className="bg-white dark:bg-[#161c2d] border-b border-slate-200 dark:border-[#243049] sticky top-0 z-30">
+            <div className="max-w-screen-xl mx-auto px-4 h-14 flex items-center gap-6">
+              <Link href="/" className="flex items-center gap-2.5 font-bold text-red-600 dark:text-red-400 text-lg">
+                <Image
+                  src="/images/husky.jpg"
+                  alt="Northeastern husky mascot"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 rounded-full object-cover ring-2 ring-red-500/70"
+                />
+                NEU Grad Planner
+              </Link>
+              <nav className="flex gap-1">
+                <Link
+                  href="/courses"
+                  className="px-3 py-1.5 rounded-md text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-[#1e2537] transition-colors"
+                >
+                  Course Browser
+                </Link>
+                <Link
+                  href="/requirements"
+                  className="px-3 py-1.5 rounded-md text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-[#1e2537] transition-colors"
+                >
+                  Graduation Planner
+                </Link>
+              </nav>
+              <ThemeToggle />
+            </div>
+          </header>
+
+          {/* Page content */}
+          <div className="max-w-screen-xl mx-auto px-4 py-6">{children}</div>
         </ThemeProvider>
       </body>
     </html>
