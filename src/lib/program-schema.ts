@@ -98,6 +98,11 @@ function reqNumber(o: Record<string, unknown>, key: string, path: string, errors
     errors.push(`${path}.${key}: expected finite number`);
 }
 
+function optString(o: Record<string, unknown>, key: string, path: string, errors: string[]) {
+  if (o[key] !== undefined && typeof o[key] !== "string")
+    errors.push(`${path}.${key}: expected string`);
+}
+
 function validateNode(v: unknown, path: string, errors: string[]): void {
   if (!isObj(v)) {
     errors.push(`${path}: expected object`);
@@ -127,8 +132,16 @@ function validateNode(v: unknown, path: string, errors: string[]): void {
     case "chooseN":
     case "chooseCredits": {
       reqString(v, "label", path, errors);
-      if (type === "chooseN") reqNumber(v, "n", path, errors);
-      if (type === "chooseCredits") reqNumber(v, "credits", path, errors);
+      if (type === "chooseN") {
+        reqNumber(v, "n", path, errors);
+        if (typeof v.n === "number" && v.n <= 0)
+          errors.push(`${path}.n: must be > 0`);
+      }
+      if (type === "chooseCredits") {
+        reqNumber(v, "credits", path, errors);
+        if (typeof v.credits === "number" && v.credits <= 0)
+          errors.push(`${path}.credits: must be > 0`);
+      }
       if (!Array.isArray(v.children) || v.children.length === 0) {
         errors.push(`${path}.children: expected non-empty array`);
         return;
@@ -157,30 +170,47 @@ export function validateProgram(input: unknown): string[] {
   if (input.level !== "UG" && input.level !== "MS" && input.level !== "PhD")
     errors.push("program.level: expected 'UG' | 'MS' | 'PhD'");
   reqNumber(input, "totalCredits", "program", errors);
+  if (typeof input.totalCredits === "number" && input.totalCredits <= 0)
+    errors.push("program.totalCredits: must be > 0");
   reqNumber(input, "minGpa", "program", errors);
+  if (typeof input.minGpa === "number" && (input.minGpa < 0 || input.minGpa > 4))
+    errors.push("program.minGpa: must be in range [0, 4]");
   reqString(input, "catalogUrl", "program", errors);
+  if (typeof input.catalogUrl === "string" && !input.catalogUrl.startsWith("https://"))
+    errors.push("program.catalogUrl: must start with https://");
   reqString(input, "catalogYear", "program", errors);
+  if (typeof input.catalogYear === "string" && !/^\d{4}-\d{4}$/.test(input.catalogYear))
+    errors.push("program.catalogYear: must match YYYY-YYYY format");
   reqString(input, "verifiedAt", "program", errors);
+  if (typeof input.verifiedAt === "string" && !/^\d{4}-\d{2}-\d{2}$/.test(input.verifiedAt))
+    errors.push("program.verifiedAt: must match YYYY-MM-DD format");
 
   validateNode(input.requirements, "program.requirements", errors);
 
   if (input.milestones !== undefined) {
     if (!Array.isArray(input.milestones)) errors.push("program.milestones: expected array");
-    else
-      input.milestones.forEach((m, i) => {
-        if (!isObj(m)) { errors.push(`program.milestones[${i}]: expected object`); return; }
-        reqString(m, "id", `program.milestones[${i}]`, errors);
-        reqString(m, "label", `program.milestones[${i}]`, errors);
-      });
+    else {
+      if (input.milestones.length === 0) errors.push("program.milestones: must be non-empty");
+      else
+        input.milestones.forEach((m, i) => {
+          if (!isObj(m)) { errors.push(`program.milestones[${i}]: expected object`); return; }
+          reqString(m, "id", `program.milestones[${i}]`, errors);
+          reqString(m, "label", `program.milestones[${i}]`, errors);
+          optString(m, "description", `program.milestones[${i}]`, errors);
+        });
+    }
   }
   if (input.infoChecklist !== undefined) {
     if (!Array.isArray(input.infoChecklist)) errors.push("program.infoChecklist: expected array");
-    else
-      input.infoChecklist.forEach((m, i) => {
-        if (!isObj(m)) { errors.push(`program.infoChecklist[${i}]: expected object`); return; }
-        reqString(m, "id", `program.infoChecklist[${i}]`, errors);
-        reqString(m, "label", `program.infoChecklist[${i}]`, errors);
-      });
+    else {
+      if (input.infoChecklist.length === 0) errors.push("program.infoChecklist: must be non-empty");
+      else
+        input.infoChecklist.forEach((m, i) => {
+          if (!isObj(m)) { errors.push(`program.infoChecklist[${i}]: expected object`); return; }
+          reqString(m, "id", `program.infoChecklist[${i}]`, errors);
+          reqString(m, "label", `program.infoChecklist[${i}]`, errors);
+        });
+    }
   }
   return errors;
 }

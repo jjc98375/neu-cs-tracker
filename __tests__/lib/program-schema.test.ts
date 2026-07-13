@@ -125,4 +125,104 @@ describe("validateProgram", () => {
     const errors = validateProgram({ ...VALID, totalCredits: Infinity });
     expect(errors.some((e) => e.includes("totalCredits"))).toBe(true);
   });
+
+  // ── Bounds & format checks (review findings) ──────────────────────────────
+
+  it("rejects totalCredits <= 0", () => {
+    const errors = validateProgram({ ...VALID, totalCredits: 0 });
+    expect(errors.some((e) => e.includes("totalCredits"))).toBe(true);
+  });
+
+  it("rejects minGpa outside [0, 4]", () => {
+    const errorsNegative = validateProgram({ ...VALID, minGpa: -0.1 });
+    expect(errorsNegative.some((e) => e.includes("minGpa"))).toBe(true);
+
+    const errorsAbove = validateProgram({ ...VALID, minGpa: 4.1 });
+    expect(errorsAbove.some((e) => e.includes("minGpa"))).toBe(true);
+  });
+
+  it("accepts minGpa at boundaries [0, 4]", () => {
+    expect(validateProgram({ ...VALID, minGpa: 0 })).toEqual([]);
+    expect(validateProgram({ ...VALID, minGpa: 4 })).toEqual([]);
+  });
+
+  it("rejects catalogUrl not starting with https://", () => {
+    const errors = validateProgram({ ...VALID, catalogUrl: "http://catalog.northeastern.edu/" });
+    expect(errors.some((e) => e.includes("catalogUrl"))).toBe(true);
+  });
+
+  it("rejects catalogYear not matching YYYY-YYYY format", () => {
+    const errorsWrong1 = validateProgram({ ...VALID, catalogYear: "2024-26" });
+    expect(errorsWrong1.some((e) => e.includes("catalogYear"))).toBe(true);
+
+    const errorsWrong2 = validateProgram({ ...VALID, catalogYear: "2024/2026" });
+    expect(errorsWrong2.some((e) => e.includes("catalogYear"))).toBe(true);
+  });
+
+  it("rejects verifiedAt not matching YYYY-MM-DD format", () => {
+    const errorsWrong1 = validateProgram({ ...VALID, verifiedAt: "07-12-2026" });
+    expect(errorsWrong1.some((e) => e.includes("verifiedAt"))).toBe(true);
+
+    const errorsWrong2 = validateProgram({ ...VALID, verifiedAt: "2026/07/12" });
+    expect(errorsWrong2.some((e) => e.includes("verifiedAt"))).toBe(true);
+  });
+
+  it("rejects milestones as empty array", () => {
+    const errors = validateProgram({ ...VALID, milestones: [] });
+    expect(errors.some((e) => e.includes("milestones"))).toBe(true);
+  });
+
+  it("rejects infoChecklist as empty array", () => {
+    const errors = validateProgram({ ...VALID, infoChecklist: [] });
+    expect(errors.some((e) => e.includes("infoChecklist"))).toBe(true);
+  });
+
+  it("rejects Milestone.description if present and not a string", () => {
+    const p = {
+      ...VALID,
+      milestones: [{ id: "qual", label: "Qualifying exam", description: 123 }],
+    };
+    const errors = validateProgram(p);
+    expect(errors.some((e) => e.includes("milestones[0]") && e.includes("description"))).toBe(true);
+  });
+
+  it("rejects chooseN with n <= 0", () => {
+    const p = {
+      ...VALID,
+      requirements: {
+        type: "allOf",
+        label: "Root",
+        children: [
+          {
+            type: "chooseN",
+            label: "Bad n",
+            n: 0,
+            children: [{ type: "course", subject: "CS", number: "5800", title: "Algorithms", credits: 4 }],
+          },
+        ],
+      },
+    };
+    const errors = validateProgram(p);
+    expect(errors.some((e) => e.includes("n") && e.includes("children[0]"))).toBe(true);
+  });
+
+  it("rejects chooseCredits with credits <= 0", () => {
+    const p = {
+      ...VALID,
+      requirements: {
+        type: "allOf",
+        label: "Root",
+        children: [
+          {
+            type: "chooseCredits",
+            label: "Bad credits",
+            credits: 0,
+            children: [{ type: "range", subject: "CS", minNumber: 5000, maxNumber: 7999, creditsPer: 4 }],
+          },
+        ],
+      },
+    };
+    const errors = validateProgram(p);
+    expect(errors.some((e) => e.includes("credits") && e.includes("children[0]"))).toBe(true);
+  });
 });
