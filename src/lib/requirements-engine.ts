@@ -82,19 +82,6 @@ function rangeMatches(node: Extract<RequirementNode, { type: "range" }>, e: Pool
   return !Number.isNaN(num) && num >= node.minNumber && num <= node.maxNumber;
 }
 
-/**
- * Recursively sum credits already claimed (pass 1) by all course-type leaves
- * in the given subtree. Used to pre-subtract exact-course claims from a
- * chooseCredits budget before the range pass runs.
- */
-function pass1ClaimedCredits(node: RequirementNode, leafMatches: Map<RequirementNode, CourseMatch[]>): number {
-  if (node.type === "course") {
-    return (leafMatches.get(node) ?? []).reduce((s, m) => s + m.credits, 0);
-  }
-  if (node.type === "range") return 0;
-  return node.children.reduce((s, c) => s + pass1ClaimedCredits(c, leafMatches), 0);
-}
-
 /** Sum of credits already claimed (pass 1) by course leaves in this subtree. */
 function claimedCourseCredits(
   node: RequirementNode,
