@@ -94,8 +94,8 @@ function reqString(o: Record<string, unknown>, key: string, path: string, errors
 }
 
 function reqNumber(o: Record<string, unknown>, key: string, path: string, errors: string[]) {
-  if (typeof o[key] !== "number" || Number.isNaN(o[key]))
-    errors.push(`${path}.${key}: expected number`);
+  if (!Number.isFinite(o[key] as number))
+    errors.push(`${path}.${key}: expected finite number`);
 }
 
 function validateNode(v: unknown, path: string, errors: string[]): void {
@@ -168,7 +168,7 @@ export function validateProgram(input: unknown): string[] {
     if (!Array.isArray(input.milestones)) errors.push("program.milestones: expected array");
     else
       input.milestones.forEach((m, i) => {
-        if (!isObj(m)) return errors.push(`program.milestones[${i}]: expected object`);
+        if (!isObj(m)) { errors.push(`program.milestones[${i}]: expected object`); return; }
         reqString(m, "id", `program.milestones[${i}]`, errors);
         reqString(m, "label", `program.milestones[${i}]`, errors);
       });
@@ -177,7 +177,7 @@ export function validateProgram(input: unknown): string[] {
     if (!Array.isArray(input.infoChecklist)) errors.push("program.infoChecklist: expected array");
     else
       input.infoChecklist.forEach((m, i) => {
-        if (!isObj(m)) return errors.push(`program.infoChecklist[${i}]: expected object`);
+        if (!isObj(m)) { errors.push(`program.infoChecklist[${i}]: expected object`); return; }
         reqString(m, "id", `program.infoChecklist[${i}]`, errors);
         reqString(m, "label", `program.infoChecklist[${i}]`, errors);
       });

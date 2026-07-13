@@ -114,4 +114,15 @@ describe("validateProgram", () => {
     const errors = validateProgram(p);
     expect(errors.some((e) => e.includes("children"))).toBe(true);
   });
+
+  it("rejects a missing requirements field", () => {
+    const { requirements: _drop, ...rest } = VALID;
+    const errors = validateProgram(rest);
+    expect(errors.some((e) => e.includes("requirements"))).toBe(true);
+  });
+
+  it("rejects non-finite numbers", () => {
+    const errors = validateProgram({ ...VALID, totalCredits: Infinity });
+    expect(errors.some((e) => e.includes("totalCredits"))).toBe(true);
+  });
 });
