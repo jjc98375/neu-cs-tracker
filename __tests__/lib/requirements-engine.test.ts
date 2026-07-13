@@ -358,4 +358,14 @@ describe("analyzeGraduation — expected graduation term by level", () => {
     );
     expect(a.expectedGraduationTerm).toBe("Fall 2026");
   });
+
+  it("summer term types are strictly ordered (40 < 50 < 60)", () => {
+    // Full Summer (…50) outranks Summer 1 (…40) as the later term.
+    const a = analyzeGraduation(
+      MINI_MS,
+      [done("CS", "5800"), { ...done("CS", "6140"), term: "202640" }],
+      [{ ...plan("CS", "7150"), term: "202650" }]
+    );
+    expect(a.expectedGraduationTerm).toBe("Summer 2026");
+  });
 });

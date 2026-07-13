@@ -206,7 +206,8 @@ export interface AnalysisV2 {
 function termToSortKey(termCode: string): number {
   const year = parseInt(termCode.slice(0, 4), 10);
   const suffix = termCode.slice(-2);
-  const order: Record<string, number> = { "10": 1, "40": 2, "50": 2, "60": 3, "30": 4 };
+  // Strict order within a year: Spring < Summer 1 < Full Summer < Summer 2 < Fall.
+  const order: Record<string, number> = { "10": 1, "40": 2, "50": 3, "60": 4, "30": 5 };
   return year * 10 + (order[suffix] ?? 5);
 }
 
