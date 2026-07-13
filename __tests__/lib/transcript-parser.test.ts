@@ -19,9 +19,9 @@ describe("termToCode", () => {
 
 describe("programToId", () => {
   it("maps the Primary Program string to a ProgramId", () => {
-    expect(programToId("M.S. in Computer Science")).toBe("MSCS");
-    expect(programToId("M.S. in Artificial Intelligence")).toBe("MSAI");
-    expect(programToId("M.S. in Data Science")).toBe("MSDS");
+    expect(programToId("M.S. in Computer Science")).toBe("mscs");
+    expect(programToId("M.S. in Artificial Intelligence")).toBe("msai");
+    expect(programToId("M.S. in Data Science")).toBe("msds");
   });
   it("returns undefined for unrecognized programs", () => {
     expect(programToId("M.S. in Cybersecurity")).toBeUndefined();
@@ -153,7 +153,7 @@ describe("parseTranscript", () => {
   let r: ParsedTranscript;
   beforeAll(() => { r = parseTranscript(REAL_TRANSCRIPT_LINES); });
 
-  it("detects the program", () => { expect(r.program).toBe("MSCS"); });
+  it("detects the program", () => { expect(r.program).toBe("mscs"); });
 
   it("parses 5 completed courses with rejoined titles", () => {
     expect(r.completed).toEqual([

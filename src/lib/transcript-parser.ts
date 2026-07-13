@@ -1,4 +1,4 @@
-import type { ProgramId } from "@/lib/requirements";
+import type { ProgramId } from "@/data/programs";
 import type { CompletedCourse, PlannedCourse } from "@/lib/types";
 
 const SEASON_SUFFIX: Record<string, string> = {
@@ -18,9 +18,9 @@ export function termToCode(term: string): string {
 }
 
 const PROGRAM_MAP: Record<string, ProgramId> = {
-  "m.s. in computer science": "MSCS",
-  "m.s. in artificial intelligence": "MSAI",
-  "m.s. in data science": "MSDS",
+  "m.s. in computer science": "mscs",
+  "m.s. in artificial intelligence": "msai",
+  "m.s. in data science": "msds",
 };
 
 export function programToId(program: string): ProgramId | undefined {
