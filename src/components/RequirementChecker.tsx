@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { CompletedCourse, PlannedCourse } from "@/lib/types";
-import type { ProgramId } from "@/lib/requirements";
-import { PROGRAMS, analyzeGraduation } from "@/lib/requirements";
-import { CheckCircle, Circle, Clock, AlertCircle, Plus, Trash2, Pencil, GraduationCap, TrendingUp } from "lucide-react";
+import { PROGRAMS, PROGRAM_IDS, LEGACY_PROGRAM_IDS, isProgramId, type ProgramId } from "@/data/programs";
+import { analyzeGraduation } from "@/lib/requirements-engine";
+import { RequirementTree } from "@/components/RequirementTree";
+import { CheckCircle, Clock, AlertCircle, Plus, Trash2, Pencil, GraduationCap, TrendingUp } from "lucide-react";
 import { clsx } from "clsx";
 import { TranscriptImport } from "@/components/TranscriptImport";
 import type { ParsedTranscript } from "@/lib/transcript-parser";
@@ -13,9 +14,11 @@ import { CourseAutocomplete } from "@/components/CourseAutocomplete";
 const STORAGE_KEY = "neu-cs-tracker:planner";
 
 interface PersistedPlanner {
-  program: ProgramId;
+  program: string; // ProgramId, but legacy uppercase ids may exist in storage
   completed: CompletedCourse[];
   planned: PlannedCourse[];
+  milestoneChecks?: Record<string, Record<string, boolean>>; // programId -> milestoneId -> done
+  nupathChecks?: Record<string, Record<string, boolean>>;    // programId -> itemId -> done
 }
 
 const EMPTY_COMPLETED: CompletedCourse = {
@@ -38,16 +41,6 @@ const TERM_OPTIONS = [
   { code: "202330", label: "Fall 2023" },
   { code: "202310", label: "Spring 2023" },
 ];
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Core:         "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/40 text-blue-700 dark:text-blue-300",
-  Systems:      "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800/40 text-orange-700 dark:text-orange-300",
-  Theory:       "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/40 text-purple-700 dark:text-purple-300",
-  Applications: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-300",
-  Elective:     "bg-slate-100 dark:bg-slate-700/30 border-slate-200 dark:border-slate-600/40 text-slate-600 dark:text-slate-300",
-  Capstone:     "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/40 text-red-700 dark:text-red-300",
-  Math:         "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800/40 text-yellow-700 dark:text-yellow-300",
-};
 
 // ─── EditableCourseRow subcomponent ──────────────────────────────────────────
 
@@ -185,7 +178,9 @@ export function EditableCourseRow({ course, type, termOptions, onSave, onDelete 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function RequirementChecker() {
-  const [program, setProgram] = useState<ProgramId>("MSCS");
+  const [program, setProgram] = useState<ProgramId>("mscs");
+  const [milestoneChecks, setMilestoneChecks] = useState<Record<string, Record<string, boolean>>>({});
+  const [nupathChecks, setNupathChecks] = useState<Record<string, Record<string, boolean>>>({});
   const [completed, setCompleted] = useState<CompletedCourse[]>([]);
   const [planned, setPlanned] = useState<PlannedCourse[]>([]);
   const [addingCompleted, setAddingCompleted] = useState(false);
@@ -199,7 +194,12 @@ export function RequirementChecker() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const saved = JSON.parse(raw) as PersistedPlanner;
-      if (saved.program) setProgram(saved.program);
+      if (saved.program) {
+        const migrated = LEGACY_PROGRAM_IDS[saved.program] ?? saved.program;
+        if (isProgramId(migrated)) setProgram(migrated);
+      }
+      if (saved.milestoneChecks) setMilestoneChecks(saved.milestoneChecks);
+      if (saved.nupathChecks) setNupathChecks(saved.nupathChecks);
       if (Array.isArray(saved.completed)) setCompleted(saved.completed);
       if (Array.isArray(saved.planned)) setPlanned(saved.planned);
     } catch {
@@ -216,12 +216,12 @@ export function RequirementChecker() {
       return;
     }
     try {
-      const payload: PersistedPlanner = { program, completed, planned };
+      const payload: PersistedPlanner = { program, completed, planned, milestoneChecks, nupathChecks };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {
       /* storage full/unavailable — degrade to session-only */
     }
-  }, [program, completed, planned]);
+  }, [program, completed, planned, milestoneChecks, nupathChecks]);
 
   function handleImport(result: ParsedTranscript) {
     if (result.program) setProgram(result.program);
@@ -229,7 +229,7 @@ export function RequirementChecker() {
     setPlanned(result.inProgress);
   }
 
-  const analysis = analyzeGraduation(program, completed, planned);
+  const analysis = analyzeGraduation(PROGRAMS[program], completed, planned);
   const prog = PROGRAMS[program];
 
   const progressPct = Math.min(
@@ -244,7 +244,7 @@ export function RequirementChecker() {
       <TranscriptImport onImport={handleImport} />
       {/* Program selector */}
       <div className="flex flex-wrap gap-3">
-        {(Object.keys(PROGRAMS) as ProgramId[]).map((pid) => (
+        {PROGRAM_IDS.map((pid) => (
           <button
             key={pid}
             onClick={() => setProgram(pid)}
@@ -320,70 +320,7 @@ export function RequirementChecker() {
       {/* Requirements list */}
       <div className="bg-white dark:bg-[#161c2d] border border-slate-200 dark:border-[#243049] rounded-xl p-5">
         <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">Program Requirements</h3>
-        <div className="space-y-2">
-          {analysis.requirementStatuses.map((s) => {
-            const req = s.requirement;
-            return (
-              <div
-                key={`${req.subject}-${req.courseNumber}`}
-                className={clsx(
-                  "flex items-center gap-3 p-3 rounded-lg border text-sm",
-                  s.status === "completed" && "bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/30",
-                  s.status === "planned" && "bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30",
-                  s.status === "missing" && "bg-slate-50 dark:bg-[#1e2537] border-slate-100 dark:border-[#243049]"
-                )}
-              >
-                {s.status === "completed" ? (
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                ) : s.status === "planned" ? (
-                  <Clock className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                ) : (
-                  <Circle className="w-5 h-5 text-slate-300 dark:text-slate-600 flex-shrink-0" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-mono font-semibold text-red-600 dark:text-red-400">
-                      {req.subject} {req.courseNumber}
-                    </span>
-                    <span className="truncate text-slate-700 dark:text-slate-200">{req.title}</span>
-                    <span
-                      className={clsx(
-                        "text-xs px-1.5 py-0.5 rounded border",
-                        CATEGORY_COLORS[req.category] ?? "bg-slate-100 dark:bg-slate-700/30 border-slate-200 dark:border-slate-600/40 text-slate-600 dark:text-slate-300"
-                      )}
-                    >
-                      {req.category}
-                    </span>
-                    {req.groupId && (
-                      <span className="text-xs text-slate-400">
-                        (group: {req.groupId})
-                      </span>
-                    )}
-                    {!req.required && (
-                      <span className="text-xs text-slate-400 italic">optional</span>
-                    )}
-                  </div>
-                  {s.status === "completed" && s.completedBy && (
-                    <div className="text-xs text-green-600 dark:text-green-400 mt-0.5">
-                      Completed ·{" "}
-                      {TERM_OPTIONS.find((t) => t.code === s.completedBy?.term)?.label ??
-                        s.completedBy.term}
-                      {s.completedBy.grade && ` · Grade: ${s.completedBy.grade}`}
-                    </div>
-                  )}
-                  {s.status === "planned" && s.plannedBy && (
-                    <div className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">
-                      Planned ·{" "}
-                      {TERM_OPTIONS.find((t) => t.code === s.plannedBy?.term)?.label ??
-                        s.plannedBy?.term}
-                    </div>
-                  )}
-                </div>
-                <span className="text-xs text-slate-400 flex-shrink-0">{req.credits} cr</span>
-              </div>
-            );
-          })}
-        </div>
+        <RequirementTree status={analysis.root} />
       </div>
 
       {/* Add completed courses */}
@@ -557,17 +494,16 @@ export function RequirementChecker() {
       </div>
 
       {/* Missing requirements */}
-      {analysis.missingRequirements.length > 0 && (
+      {analysis.missing.length > 0 && (
         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40 rounded-xl p-5">
           <h3 className="font-semibold text-amber-800 dark:text-amber-300 mb-3 flex items-center gap-2">
             <AlertCircle className="w-5 h-5" /> Missing Requirements
           </h3>
           <ul className="space-y-1 text-sm text-amber-700 dark:text-amber-400">
-            {analysis.missingRequirements.map((r) => (
-              <li key={`${r.subject}-${r.courseNumber}`} className="flex items-center gap-2">
-                <span className="font-mono font-semibold">{r.subject} {r.courseNumber}</span>
-                <span>{r.title}</span>
-                {r.groupId && <span className="text-amber-500 text-xs">(choose 1 from group)</span>}
+            {analysis.missing.map((m) => (
+              <li key={m.label} className="flex items-center gap-2">
+                <span className="font-semibold">{m.label}</span>
+                <span className="text-amber-500 text-xs">{m.detail}</span>
               </li>
             ))}
           </ul>
