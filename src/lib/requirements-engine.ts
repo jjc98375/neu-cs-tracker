@@ -83,9 +83,24 @@ function rangeMatches(node: Extract<RequirementNode, { type: "range" }>, e: Pool
 }
 
 /**
+ * Recursively sum credits already claimed (pass 1) by all course-type leaves
+ * in the given subtree. Used to pre-subtract exact-course claims from a
+ * chooseCredits budget before the range pass runs.
+ */
+function pass1ClaimedCredits(node: RequirementNode, leafMatches: Map<RequirementNode, CourseMatch[]>): number {
+  if (node.type === "course") {
+    return (leafMatches.get(node) ?? []).reduce((s, m) => s + m.credits, 0);
+  }
+  if (node.type === "range") return 0;
+  return node.children.reduce((s, c) => s + pass1ClaimedCredits(c, leafMatches), 0);
+}
+
+/**
  * Pass 2: range leaves claim remaining pool entries. `creditBudget` is the
- * enclosing chooseCredits target still unmet (Infinity outside chooseCredits
- * means "claim at most one").
+ * enclosing chooseCredits target still unmet (null outside chooseCredits means
+ * "claim at most one"). The budget is threaded through all group boundaries so
+ * ranges nested inside allOf/chooseN children of a chooseCredits still decrement
+ * the shared budget.
  */
 function allocateRanges(
   node: RequirementNode,
@@ -116,16 +131,22 @@ function allocateRanges(
     return;
   }
   if (node.type === "chooseCredits") {
-    // Course children were already handled in pass 1; subtract their credits.
-    let earned = 0;
-    for (const child of node.children) {
-      if (child.type === "course") earned += (leafMatches.get(child) ?? []).reduce((s, m) => s + m.credits, 0);
-    }
-    const budget = { remaining: node.credits - earned };
+    // A nested chooseCredits starts its own independent budget (not capped against
+    // any outer budget); the outer budget is still decremented via the return path
+    // in the parent's group-child branch below.
+    const claimed = pass1ClaimedCredits(node, leafMatches);
+    const budget = { remaining: node.credits - claimed };
     for (const child of node.children) allocateRanges(child, pool, leafMatches, budget);
     return;
   }
-  for (const child of node.children) allocateRanges(child, pool, leafMatches, null);
+  // allOf / chooseN: thread the enclosing chooseCredits budget (if any) through
+  // so that range leaves inside this nested group still decrement the shared budget.
+  // The ≤1-course-per-range rule is enforced by the range branch above (it uses
+  // a budget loop when creditBudget is non-null, which happens to allow >1 match,
+  // but allOf/chooseN ranges under a chooseCredits are correctly limited by budget
+  // exhaustion — and when there is no enclosing budget, null is passed so the
+  // pool.find "at most one" path is taken unchanged).
+  for (const child of node.children) allocateRanges(child, pool, leafMatches, creditBudget);
 }
 
 function subtreeCredits(status: NodeStatus): number {

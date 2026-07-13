@@ -177,3 +177,47 @@ describe("evaluateTree — chooseCredits with course children", () => {
     expect(s.state).toBe("complete");
   });
 });
+
+describe("evaluateTree — nested groups under chooseCredits", () => {
+  it("Test A: range sibling of allOf child does not over-claim when allOf already consumed credits", () => {
+    // chooseCredits(8) contains: allOf([course CS 5010 (4cr)]) + range CS 5000-7999
+    // completed = [CS 5010, CS 6620, CS 6650]
+    // Pass 1: CS 5010 consumed by the allOf's course child (4cr toward budget).
+    // Budget entering pass 2: 8 - 4 = 4cr remaining.
+    // The range should claim exactly ONE course (4cr), not two.
+    const root: RequirementNode = {
+      type: "chooseCredits", label: "Group", credits: 8,
+      children: [
+        { type: "allOf", label: "Seq", children: [course("CS", "5010")] },
+        { type: "range", subject: "CS", minNumber: 5000, maxNumber: 7999, creditsPer: 4 },
+      ],
+    };
+    const s = evaluateTree(root, [done("CS", "5010"), done("CS", "6620"), done("CS", "6650")], []);
+    expect(s.earned).toBe(8);
+    // The range child should have matched exactly 1 course (4cr), not 2
+    const rangeChild = s.children[1];
+    expect(rangeChild.matches.length).toBe(1);
+  });
+
+  it("Test B: budget threads through nested chooseN so sibling range gets nothing once budget exhausted", () => {
+    // chooseCredits(4) contains: chooseN(1, [range CS 7000-7999]) + range CS 5000-6999
+    // completed = [CS 7150 (4cr), CS 6620 (4cr)]
+    // Pass 1: nothing (no exact course leaves).
+    // Budget entering pass 2: 4cr.
+    // The nested range under chooseN claims CS 7150 (4cr) → budget now 0.
+    // The sibling range should claim NOTHING (budget exhausted).
+    const root: RequirementNode = {
+      type: "chooseCredits", label: "Group", credits: 4,
+      children: [
+        { type: "chooseN", label: "Advanced", n: 1,
+          children: [{ type: "range", subject: "CS", minNumber: 7000, maxNumber: 7999, creditsPer: 4 }] },
+        { type: "range", subject: "CS", minNumber: 5000, maxNumber: 6999, creditsPer: 4 },
+      ],
+    };
+    const s = evaluateTree(root, [done("CS", "7150"), done("CS", "6620")], []);
+    expect(s.earned).toBe(4);
+    // Sibling range (second child) should have 0 matches
+    const siblingRange = s.children[1];
+    expect(siblingRange.matches.length).toBe(0);
+  });
+});
