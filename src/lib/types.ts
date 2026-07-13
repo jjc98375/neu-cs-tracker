@@ -84,26 +84,6 @@ export interface SearchResult {
 // Graduation / Requirements
 // ──────────────────────────────────────────────────────────────────────────────
 
-export type RequirementCategory =
-  | "Core"
-  | "Systems"
-  | "Theory"
-  | "Applications"
-  | "Elective"
-  | "Capstone"
-  | "Math";
-
-export interface RequirementCourse {
-  subject: string;
-  courseNumber: string;
-  title: string;
-  credits: number;
-  category: RequirementCategory;
-  required: boolean; // true = must take, false = choose from group
-  groupId?: string;  // courses with the same groupId are "choose N from this group"
-  groupMinCount?: number;
-}
-
 export interface CompletedCourse {
   subject: string;
   courseNumber: string;
@@ -119,22 +99,4 @@ export interface PlannedCourse {
   title: string;
   credits: number;
   term: string;
-}
-
-export interface RequirementStatus {
-  requirement: RequirementCourse;
-  status: "completed" | "planned" | "missing";
-  completedBy?: CompletedCourse;
-  plannedBy?: PlannedCourse;
-}
-
-export interface GraduationAnalysis {
-  totalCreditsRequired: number;
-  totalCreditsCompleted: number;
-  totalCreditsPlanned: number;
-  totalCreditsRemaining: number;
-  requirementStatuses: RequirementStatus[];
-  missingRequirements: RequirementCourse[];
-  expectedGraduationTerm: string | null;
-  onTrack: boolean;
 }
