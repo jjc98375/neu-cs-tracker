@@ -256,3 +256,106 @@ describe("evaluateTree — nested groups under chooseCredits (review findings)",
     expect(s.state).toBe("complete");
   });
 });
+
+import { analyzeGraduation } from "@/lib/requirements-engine";
+import type { ProgramV2 } from "@/lib/program-schema";
+
+const MINI_MS: ProgramV2 = {
+  id: "mini-ms", name: "Mini MS", level: "MS", totalCredits: 12, minGpa: 3.0,
+  catalogUrl: "https://catalog.northeastern.edu/x/", catalogYear: "2024-2026", verifiedAt: "2026-07-12",
+  requirements: {
+    type: "allOf", label: "Mini MS",
+    children: [
+      course("CS", "5800"),
+      { type: "chooseN", label: "Breadth", n: 1, children: [course("CS", "6140"), course("CS", "6220")] },
+    ],
+  },
+};
+
+describe("analyzeGraduation — credits and onTrack", () => {
+  it("empty inputs: all credits remaining, not on track, no grad term", () => {
+    const a = analyzeGraduation(MINI_MS, [], []);
+    expect(a.totalCreditsRequired).toBe(12);
+    expect(a.totalCreditsCompleted).toBe(0);
+    expect(a.totalCreditsPlanned).toBe(0);
+    expect(a.totalCreditsRemaining).toBe(12);
+    expect(a.onTrack).toBe(false);
+    expect(a.expectedGraduationTerm).toBeNull();
+  });
+
+  it("sums completed and planned credits; remaining never negative", () => {
+    const a = analyzeGraduation(
+      MINI_MS,
+      [done("CS", "5800"), done("CS", "6140")],
+      [plan("CS", "7150"), plan("CS", "7140")]
+    );
+    expect(a.totalCreditsCompleted).toBe(8);
+    expect(a.totalCreditsPlanned).toBe(8);
+    expect(a.totalCreditsRemaining).toBe(0);
+  });
+
+  it("onTrack requires root complete AND zero remaining credits", () => {
+    const requirementsMet = analyzeGraduation(MINI_MS, [done("CS", "5800"), done("CS", "6140")], []);
+    expect(requirementsMet.root.state).toBe("complete");
+    expect(requirementsMet.onTrack).toBe(false); // 4 credits still remaining
+    const all = analyzeGraduation(MINI_MS, [done("CS", "5800"), done("CS", "6140"), done("CS", "7000")], []);
+    expect(all.onTrack).toBe(true);
+  });
+});
+
+describe("analyzeGraduation — missing list", () => {
+  it("lists unmet required leaves and unmet groups with shortfall detail", () => {
+    const a = analyzeGraduation(MINI_MS, [], []);
+    expect(a.missing).toEqual([
+      { label: "CS 5800 — CS 5800", detail: "required" },
+      { label: "Breadth", detail: "1 more course" },
+    ]);
+  });
+
+  it("does not list satisfied groups", () => {
+    const a = analyzeGraduation(MINI_MS, [done("CS", "6140")], []);
+    expect(a.missing).toEqual([{ label: "CS 5800 — CS 5800", detail: "required" }]);
+  });
+
+  it("credit-group shortfall is reported in credits", () => {
+    const p: ProgramV2 = {
+      ...MINI_MS,
+      requirements: {
+        type: "chooseCredits", label: "Electives", credits: 8,
+        children: [{ type: "range", subject: "CS", minNumber: 5000, maxNumber: 7999, creditsPer: 4 }],
+      },
+    };
+    const a = analyzeGraduation(p, [done("CS", "6620")], []);
+    expect(a.missing).toEqual([{ label: "Electives", detail: "4 more credits" }]);
+  });
+});
+
+describe("analyzeGraduation — expected graduation term by level", () => {
+  it("MS paces at 8 credits/term", () => {
+    // 12-credit program, 4 credits done in Spring 2025 → 8 remaining → 1 more term → Fall 2025
+    const a = analyzeGraduation(MINI_MS, [done("CS", "5800")], []);
+    expect(a.expectedGraduationTerm).toBe("Fall 2025");
+  });
+
+  it("UG paces at 16 credits/term", () => {
+    const ug: ProgramV2 = { ...MINI_MS, id: "mini-ug", level: "UG", totalCredits: 36 };
+    // 4 done in Spring 2025 → 32 remaining → 2 terms → Fall 2025, Spring 2026
+    const a = analyzeGraduation(ug, [done("CS", "5800")], []);
+    expect(a.expectedGraduationTerm).toBe("Spring 2026");
+  });
+
+  it("PhD has no projection", () => {
+    const phd: ProgramV2 = { ...MINI_MS, id: "mini-phd", level: "PhD" };
+    const a = analyzeGraduation(phd, [done("CS", "5800")], []);
+    expect(a.expectedGraduationTerm).toBeNull();
+  });
+
+  it("last course term is the grad term when nothing remains", () => {
+    const a = analyzeGraduation(
+      MINI_MS,
+      [done("CS", "5800"), done("CS", "6140")],
+      [{ ...plan("CS", "7150"), term: "202630" }]
+    );
+    expect(a.expectedGraduationTerm).toBe("Fall 2026");
+  });
+});

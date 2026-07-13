@@ -184,5 +184,133 @@ export function evaluateTree(
   return evaluate(root, leafMatches);
 }
 
-// analyzeGraduation and term helpers are added in the next task.
+// ── Analysis summary ─────────────────────────────────────────────────────────
+
+export interface MissingItem {
+  label: string;
+  detail: string;
+}
+
+export interface AnalysisV2 {
+  program: ProgramV2;
+  totalCreditsRequired: number;
+  totalCreditsCompleted: number;
+  totalCreditsPlanned: number;
+  totalCreditsRemaining: number;
+  root: NodeStatus;
+  missing: MissingItem[];
+  expectedGraduationTerm: string | null;
+  onTrack: boolean;
+}
+
+function termToSortKey(termCode: string): number {
+  const year = parseInt(termCode.slice(0, 4), 10);
+  const suffix = termCode.slice(-2);
+  const order: Record<string, number> = { "10": 1, "40": 2, "50": 2, "60": 3, "30": 4 };
+  return year * 10 + (order[suffix] ?? 5);
+}
+
+function termDescription(termCode: string): string {
+  const year = termCode.slice(0, 4);
+  const suffix = termCode.slice(-2);
+  const map: Record<string, string> = {
+    "10": "Spring", "30": "Fall", "40": "Summer 1", "50": "Summer", "60": "Summer 2",
+  };
+  return `${map[suffix] ?? suffix} ${year}`;
+}
+
+function nextTerm(termCode: string): string {
+  const year = parseInt(termCode.slice(0, 4), 10);
+  const suffix = termCode.slice(-2);
+  if (suffix === "10") return `${year}30`;
+  if (suffix === "30") return `${year + 1}10`;
+  if (suffix === "40") return `${year}60`;
+  if (suffix === "60") return `${year}30`;
+  if (suffix === "50") return `${year}30`;
+  return `${year + 1}10`;
+}
+
+/**
+ * Collect actionable gaps: unmet course leaves that are strictly required
+ * (direct child of an allOf chain from the root) and unmet groups (with
+ * their shortfall). Options inside an unmet chooseN/chooseCredits are not
+ * listed individually — the group entry covers them.
+ */
+function collectMissing(status: NodeStatus, out: MissingItem[], underAllOf: boolean): void {
+  const node = status.node;
+  if (node.type === "course") {
+    if (underAllOf && status.state === "missing")
+      out.push({ label: `${node.subject} ${node.number} — ${node.title}`, detail: "required" });
+    return;
+  }
+  if (node.type === "range") return;
+  if (node.type === "allOf") {
+    for (const child of status.children) collectMissing(child, out, true);
+    return;
+  }
+  // chooseN / chooseCredits
+  if (status.state !== "complete") {
+    const shortfall = status.required - status.earned;
+    out.push({
+      label: node.label,
+      detail: status.unit === "credits"
+        ? `${shortfall} more credit${shortfall === 1 ? "" : "s"}`
+        : `${shortfall} more course${shortfall === 1 ? "" : "s"}`,
+    });
+  }
+}
+
+const CREDITS_PER_TERM: Record<ProgramV2["level"], number | null> = {
+  UG: 16,
+  MS: 8,
+  PhD: null,
+};
+
+export function analyzeGraduation(
+  program: ProgramV2,
+  completed: CompletedCourse[],
+  planned: PlannedCourse[]
+): AnalysisV2 {
+  const root = evaluateTree(program.requirements, completed, planned);
+
+  const totalCreditsCompleted = completed.reduce((s, c) => s + c.credits, 0);
+  const totalCreditsPlanned = planned.reduce((s, c) => s + c.credits, 0);
+  const totalCreditsRemaining = Math.max(
+    0,
+    program.totalCredits - totalCreditsCompleted - totalCreditsPlanned
+  );
+
+  const missing: MissingItem[] = [];
+  collectMissing(root, missing, false);
+
+  const onTrack = root.state === "complete" && totalCreditsRemaining === 0;
+
+  let expectedGraduationTerm: string | null = null;
+  const pace = CREDITS_PER_TERM[program.level];
+  const allTerms = [...completed.map((c) => c.term), ...planned.map((c) => c.term)];
+  if (pace !== null && allTerms.length > 0) {
+    const lastTerm = allTerms.sort((a, b) => termToSortKey(b) - termToSortKey(a))[0];
+    if (totalCreditsRemaining <= 0) {
+      expectedGraduationTerm = termDescription(lastTerm);
+    } else {
+      const termsNeeded = Math.ceil(totalCreditsRemaining / pace);
+      let term = lastTerm;
+      for (let i = 0; i < termsNeeded; i++) term = nextTerm(term);
+      expectedGraduationTerm = termDescription(term);
+    }
+  }
+
+  return {
+    program,
+    totalCreditsRequired: program.totalCredits,
+    totalCreditsCompleted,
+    totalCreditsPlanned,
+    totalCreditsRemaining,
+    root,
+    missing,
+    expectedGraduationTerm,
+    onTrack,
+  };
+}
+
 export type { ProgramV2 };
