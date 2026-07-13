@@ -95,35 +95,42 @@ function pass1ClaimedCredits(node: RequirementNode, leafMatches: Map<Requirement
   return node.children.reduce((s, c) => s + pass1ClaimedCredits(c, leafMatches), 0);
 }
 
+/** Sum of credits already claimed (pass 1) by course leaves in this subtree. */
+function claimedCourseCredits(
+  node: RequirementNode,
+  leafMatches: Map<RequirementNode, CourseMatch[]>
+): number {
+  if (node.type === "course")
+    return (leafMatches.get(node) ?? []).reduce((s, m) => s + m.credits, 0);
+  if (node.type === "range") return 0;
+  return node.children.reduce((s, c) => s + claimedCourseCredits(c, leafMatches), 0);
+}
+
 /**
- * Pass 2: range leaves claim remaining pool entries. `creditBudget` is the
- * enclosing chooseCredits target still unmet (null outside chooseCredits means
- * "claim at most one"). The budget is threaded through all group boundaries so
- * ranges nested inside allOf/chooseN children of a chooseCredits still decrement
- * the shared budget.
+ * Pass 2: range leaves claim remaining pool entries. Inside a chooseCredits
+ * subtree, all descendant ranges share the group's credit budget (pre-reduced
+ * by every course credit pass 1 claimed anywhere in the subtree). A range whose
+ * DIRECT parent is allOf/chooseN claims at most one course (still decrementing
+ * the shared budget when one is active); a range directly under chooseCredits
+ * claims until the budget is met. Nested chooseCredits groups keep independent
+ * budgets.
  */
 function allocateRanges(
   node: RequirementNode,
   pool: PoolEntry[],
   leafMatches: Map<RequirementNode, CourseMatch[]>,
-  creditBudget: { remaining: number } | null
+  creditBudget: { remaining: number } | null,
+  singleClaim: boolean
 ): void {
   if (node.type === "course") return;
   if (node.type === "range") {
     const matches: CourseMatch[] = [];
-    if (creditBudget) {
-      for (const e of pool) {
-        if (creditBudget.remaining <= 0) break;
-        if (rangeMatches(node, e)) {
-          e.consumed = true;
-          creditBudget.remaining -= e.match.credits;
-          matches.push(e.match);
-        }
-      }
-    } else {
-      const e = pool.find((x) => rangeMatches(node, x));
-      if (e) {
+    for (const e of pool) {
+      if (creditBudget && creditBudget.remaining <= 0) break;
+      if (singleClaim && matches.length >= 1) break;
+      if (rangeMatches(node, e)) {
         e.consumed = true;
+        if (creditBudget) creditBudget.remaining -= e.match.credits;
         matches.push(e.match);
       }
     }
@@ -131,22 +138,12 @@ function allocateRanges(
     return;
   }
   if (node.type === "chooseCredits") {
-    // A nested chooseCredits starts its own independent budget (not capped against
-    // any outer budget); the outer budget is still decremented via the return path
-    // in the parent's group-child branch below.
-    const claimed = pass1ClaimedCredits(node, leafMatches);
-    const budget = { remaining: node.credits - claimed };
-    for (const child of node.children) allocateRanges(child, pool, leafMatches, budget);
+    const budget = { remaining: node.credits - claimedCourseCredits(node, leafMatches) };
+    for (const child of node.children) allocateRanges(child, pool, leafMatches, budget, false);
     return;
   }
-  // allOf / chooseN: thread the enclosing chooseCredits budget (if any) through
-  // so that range leaves inside this nested group still decrement the shared budget.
-  // The ≤1-course-per-range rule is enforced by the range branch above (it uses
-  // a budget loop when creditBudget is non-null, which happens to allow >1 match,
-  // but allOf/chooseN ranges under a chooseCredits are correctly limited by budget
-  // exhaustion — and when there is no enclosing budget, null is passed so the
-  // pool.find "at most one" path is taken unchanged).
-  for (const child of node.children) allocateRanges(child, pool, leafMatches, creditBudget);
+  // allOf / chooseN: propagate any active budget; direct range children claim once.
+  for (const child of node.children) allocateRanges(child, pool, leafMatches, creditBudget, true);
 }
 
 function subtreeCredits(status: NodeStatus): number {
@@ -196,7 +193,7 @@ export function evaluateTree(
   const pool = buildPool(completed, planned);
   const leafMatches = new Map<RequirementNode, CourseMatch[]>();
   allocateExact(root, pool, leafMatches);
-  allocateRanges(root, pool, leafMatches, null);
+  allocateRanges(root, pool, leafMatches, null, true);
   return evaluate(root, leafMatches);
 }
 

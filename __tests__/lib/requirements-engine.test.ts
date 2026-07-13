@@ -221,3 +221,38 @@ describe("evaluateTree — nested groups under chooseCredits", () => {
     expect(siblingRange.matches.length).toBe(0);
   });
 });
+
+describe("evaluateTree — nested groups under chooseCredits (review findings)", () => {
+  it("subtracts course credits claimed inside nested groups from the budget", () => {
+    const root: RequirementNode = {
+      type: "chooseCredits", label: "Depth", credits: 8,
+      children: [
+        { type: "allOf", label: "Pair", children: [course("CS", "6140")] },
+        { type: "range", subject: "CS", minNumber: 5000, maxNumber: 7999, creditsPer: 4 },
+      ],
+    };
+    // CS 6140 (4cr) is claimed in pass 1 inside the nested allOf; the budget
+    // must start at 8-4=4, so the range claims exactly one more course.
+    const s = evaluateTree(root, [done("CS", "6140"), done("CS", "6620"), done("CS", "6650")], []);
+    expect(s.earned).toBe(8);
+    expect(s.state).toBe("complete");
+    expect(s.children[1].matches.length).toBe(1);
+  });
+
+  it("a range inside a nested allOf under chooseCredits shares the credit budget", () => {
+    const root: RequirementNode = {
+      type: "chooseCredits", label: "Electives", credits: 8,
+      children: [
+        { type: "allOf", label: "Wrapper", children: [
+          { type: "range", subject: "CS", minNumber: 5000, maxNumber: 7999, creditsPer: 4 },
+        ]},
+        { type: "range", subject: "DS", minNumber: 5000, maxNumber: 7999, creditsPer: 4 },
+      ],
+    };
+    // Nested range claims one CS course (direct parent allOf → single claim,
+    // budget 8→4); the sibling DS range then claims one DS course (budget 4→0).
+    const s = evaluateTree(root, [done("CS", "6620"), done("CS", "6650"), done("DS", "5230")], []);
+    expect(s.earned).toBe(8);
+    expect(s.state).toBe("complete");
+  });
+});
