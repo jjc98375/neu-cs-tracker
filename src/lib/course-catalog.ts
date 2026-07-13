@@ -1,4 +1,5 @@
-import { PROGRAMS } from "@/lib/requirements";
+import { PROGRAMS } from "@/data/programs";
+import type { RequirementNode } from "@/lib/program-schema";
 
 export interface CatalogCourse {
   subject: string;
@@ -7,15 +8,22 @@ export interface CatalogCourse {
   credits: number;
 }
 
+function collectCourses(node: RequirementNode, seen: Map<string, CatalogCourse>): void {
+  if (node.type === "course") {
+    const key = `${node.subject} ${node.number}`;
+    if (!seen.has(key)) {
+      seen.set(key, { subject: node.subject, courseNumber: node.number, title: node.title, credits: node.credits });
+    }
+    return;
+  }
+  if (node.type === "range") return;
+  for (const child of node.children) collectCourses(child, seen);
+}
+
 function buildCatalog(): CatalogCourse[] {
   const seen = new Map<string, CatalogCourse>();
   for (const program of Object.values(PROGRAMS)) {
-    for (const req of program.requirements) {
-      const key = `${req.subject} ${req.courseNumber}`;
-      if (!seen.has(key)) {
-        seen.set(key, { subject: req.subject, courseNumber: req.courseNumber, title: req.title, credits: req.credits });
-      }
-    }
+    collectCourses(program.requirements, seen);
   }
   return [...seen.values()];
 }
