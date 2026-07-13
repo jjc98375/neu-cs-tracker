@@ -10,6 +10,7 @@ import { clsx } from "clsx";
 import { TranscriptImport } from "@/components/TranscriptImport";
 import type { ParsedTranscript } from "@/lib/transcript-parser";
 import { CourseAutocomplete } from "@/components/CourseAutocomplete";
+import { MilestoneChecklist } from "@/components/MilestoneChecklist";
 
 const STORAGE_KEY = "neu-cs-tracker:planner";
 
@@ -322,6 +323,33 @@ export function RequirementChecker() {
         <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">Program Requirements</h3>
         <RequirementTree status={analysis.root} />
       </div>
+
+      {prog.milestones && prog.milestones.length > 0 && (
+        <MilestoneChecklist
+          title="Milestones"
+          items={prog.milestones}
+          checks={milestoneChecks[program] ?? {}}
+          onToggle={(id) =>
+            setMilestoneChecks({
+              ...milestoneChecks,
+              [program]: { ...(milestoneChecks[program] ?? {}), [id]: !(milestoneChecks[program]?.[id]) },
+            })
+          }
+        />
+      )}
+      {prog.infoChecklist && prog.infoChecklist.length > 0 && (
+        <MilestoneChecklist
+          title="NUpath (verify with your advisor)"
+          items={prog.infoChecklist}
+          checks={nupathChecks[program] ?? {}}
+          onToggle={(id) =>
+            setNupathChecks({
+              ...nupathChecks,
+              [program]: { ...(nupathChecks[program] ?? {}), [id]: !(nupathChecks[program]?.[id]) },
+            })
+          }
+        />
+      )}
 
       {/* Add completed courses */}
       <div className="bg-white dark:bg-[#161c2d] border border-slate-200 dark:border-[#243049] rounded-xl p-5">
