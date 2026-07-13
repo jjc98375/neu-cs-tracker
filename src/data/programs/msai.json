@@ -15,8 +15,20 @@
         "type": "allOf",
         "label": "Core",
         "children": [
-          { "type": "course", "subject": "CS", "number": "5100", "title": "Foundations of Artificial Intelligence", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5130", "title": "Applied Programming and Data Processing for AI", "credits": 4 }
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "5100",
+            "title": "Foundations of Artificial Intelligence",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "5130",
+            "title": "Applied Programming and Data Processing for AI",
+            "credits": 4
+          }
         ]
       },
       {
@@ -24,8 +36,20 @@
         "label": "Core Math (choose 1)",
         "n": 1,
         "children": [
-          { "type": "course", "subject": "DADS", "number": "5200", "title": "Mathematics for Machine Learning", "credits": 4 },
-          { "type": "course", "subject": "DS", "number": "5020", "title": "Linear Algebra and Probability for Data Science", "credits": 4 }
+          {
+            "type": "course",
+            "subject": "DADS",
+            "number": "5200",
+            "title": "Mathematics for Machine Learning",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "DS",
+            "number": "5020",
+            "title": "Linear Algebra and Probability for Data Science",
+            "credits": 4
+          }
         ]
       },
       {
@@ -33,26 +57,104 @@
         "label": "Core Machine Learning (choose 1)",
         "n": 1,
         "children": [
-          { "type": "course", "subject": "EECE", "number": "5644", "title": "Intro to Machine Learning and Pattern Recognition", "credits": 4 },
-          { "type": "course", "subject": "DADS", "number": "7275", "title": "Machine Learning and Data Analytics", "credits": 4 }
+          {
+            "type": "course",
+            "subject": "EECE",
+            "number": "5644",
+            "title": "Intro to Machine Learning and Pattern Recognition",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "DADS",
+            "number": "7275",
+            "title": "Machine Learning and Data Analytics",
+            "credits": 4
+          }
         ]
       },
       {
         "type": "chooseN",
-        "label": "Specialization (choose 2 from one area)",
+        "label": "Specialization (choose 2)",
         "n": 2,
         "children": [
-          { "type": "course", "subject": "CS", "number": "5330", "title": "Pattern Recognition and Computer Vision", "credits": 4 },
-          { "type": "course", "subject": "EECE", "number": "5639", "title": "Computer Vision", "credits": 4 },
-          { "type": "course", "subject": "EECE", "number": "7370", "title": "Advanced Computer Vision", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7140", "title": "Advanced Machine Learning", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7150", "title": "Deep Learning", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6220", "title": "Data Mining Techniques", "credits": 4 },
-          { "type": "course", "subject": "DS", "number": "5230", "title": "Unsupervised Machine Learning and Data Mining", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5180", "title": "Reinforcement Learning and Sequential Decision Making", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5335", "title": "Robotic Science and Systems", "credits": 4 },
-          { "type": "course", "subject": "EECE", "number": "5550", "title": "Mobile Robotics", "credits": 4 },
-          { "type": "course", "subject": "EECE", "number": "5554", "title": "Robotics Sensing and Navigation", "credits": 4 }
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "5330",
+            "title": "Pattern Recognition and Computer Vision",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "EECE",
+            "number": "5639",
+            "title": "Computer Vision",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "EECE",
+            "number": "7370",
+            "title": "Advanced Computer Vision",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "7140",
+            "title": "Advanced Machine Learning",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "7150",
+            "title": "Deep Learning",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "6220",
+            "title": "Data Mining Techniques",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "DS",
+            "number": "5230",
+            "title": "Unsupervised Machine Learning and Data Mining",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "5180",
+            "title": "Reinforcement Learning and Sequential Decision Making",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "CS",
+            "number": "5335",
+            "title": "Robotic Science and Systems",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "EECE",
+            "number": "5550",
+            "title": "Mobile Robotics",
+            "credits": 4
+          },
+          {
+            "type": "course",
+            "subject": "EECE",
+            "number": "5554",
+            "title": "Robotics Sensing and Navigation",
+            "credits": 4
+          }
         ]
       }
     ]
