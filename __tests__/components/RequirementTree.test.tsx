@@ -58,4 +58,25 @@ describe("RequirementTree", () => {
     expect(screen.getByText("4 of 8 credits")).toBeDefined();
     expect(screen.getByText("Any CS 5000–7999")).toBeDefined();
   });
+
+  it("does not leak collapse state across different trees", () => {
+    const { rerender } = render(<RequirementTree status={statusFor([])} />);
+    fireEvent.click(screen.getByRole("button", { name: /Breadth/ }));
+    expect(screen.queryByText("CS 6140")).toBeNull();
+
+    // Different program whose group sits at the SAME child index as "Breadth".
+    const OTHER: RequirementNode = {
+      type: "allOf", label: "Other program",
+      children: [
+        { type: "course", subject: "DS", number: "5500", title: "Capstone", credits: 4 },
+        {
+          type: "chooseN", label: "Depth", n: 1,
+          children: [{ type: "course", subject: "DS", number: "5110", title: "Essentials", credits: 4 }],
+        },
+      ],
+    };
+    rerender(<RequirementTree status={evaluateTree(OTHER, [], [])} />);
+    // Fresh group identity → mounts expanded, its children visible.
+    expect(screen.getByText("DS 5110")).toBeDefined();
+  });
 });

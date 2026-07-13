@@ -5,6 +5,13 @@ import { CheckCircle, Circle, Clock, ChevronDown, ChevronRight } from "lucide-re
 import { clsx } from "clsx";
 import type { NodeStatus } from "@/lib/requirements-engine";
 
+/** Stable identity key so collapse state never leaks between different nodes. */
+function nodeKey(node: NodeStatus["node"]): string {
+  if (node.type === "course") return `course:${node.subject} ${node.number}`;
+  if (node.type === "range") return `range:${node.subject} ${node.minNumber}-${node.maxNumber}`;
+  return `${node.type}:${node.label}`;
+}
+
 function StateIcon({ state }: { state: NodeStatus["state"] }) {
   if (state === "complete") return <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />;
   if (state === "planned") return <Clock className="w-5 h-5 text-blue-500 flex-shrink-0" />;
@@ -85,8 +92,8 @@ function GroupSection({ status, depth }: { status: NodeStatus; depth: number }) 
       </button>
       {open && (
         <div className="space-y-2">
-          {status.children.map((child, i) => (
-            <GroupSection key={i} status={child} depth={depth + 1} />
+          {status.children.map((child) => (
+            <GroupSection key={nodeKey(child.node)} status={child} depth={depth + 1} />
           ))}
         </div>
       )}
