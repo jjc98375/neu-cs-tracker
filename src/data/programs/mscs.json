@@ -1,0 +1,70 @@
+{
+  "id": "mscs",
+  "name": "MS Computer Science (MSCS)",
+  "level": "MS",
+  "totalCredits": 32,
+  "minGpa": 3.0,
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/computer-science/computer-science-mscs/",
+  "catalogYear": "2024-2026",
+  "verifiedAt": "2026-07-12",
+  "requirements": {
+    "type": "allOf",
+    "label": "MS in Computer Science",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Core",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "5010", "title": "Programming Design Paradigm", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5800", "title": "Algorithms", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Breadth: AI & Data Science",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "CS", "number": "5100", "title": "Foundations of Artificial Intelligence", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5150", "title": "Game Artificial Intelligence", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5200", "title": "Database Management Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5330", "title": "Pattern Recognition and Computer Vision", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6120", "title": "Natural Language Processing", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6140", "title": "Machine Learning", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6200", "title": "Information Retrieval", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6220", "title": "Data Mining Techniques", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6240", "title": "Large-Scale Parallel Data Processing", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7140", "title": "Advanced Machine Learning", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Breadth: Systems & Software",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "CS", "number": "5400", "title": "Principles of Programming Language", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5500", "title": "Foundations of Software Engineering", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5520", "title": "Mobile Application Development", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5600", "title": "Computer Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5610", "title": "Web Development", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5700", "title": "Fundamentals of Computer Networking", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5850", "title": "Building Game Engines", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6410", "title": "Compilers", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6510", "title": "Advanced Software Development", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6620", "title": "Fundamentals of Cloud Computing", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6650", "title": "Building Scalable Distributed Systems", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Breadth: Theory & Security",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "CS", "number": "6760", "title": "Privacy, Security, and Usability", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7805", "title": "Complexity Theory", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5770", "title": "Software Vulnerabilities and Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6740", "title": "Network Security", "credits": 4 }
+        ]
+      }
+    ]
+  }
+}

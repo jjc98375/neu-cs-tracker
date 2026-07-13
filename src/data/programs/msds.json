@@ -1,0 +1,68 @@
+{
+  "id": "msds",
+  "name": "MS Data Science (MSDS)",
+  "level": "MS",
+  "totalCredits": 32,
+  "minGpa": 3.0,
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/data-science/data-science-ms/",
+  "catalogYear": "2024-2026",
+  "verifiedAt": "2026-07-12",
+  "requirements": {
+    "type": "allOf",
+    "label": "MS in Data Science",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Core",
+        "children": [
+          { "type": "course", "subject": "DS", "number": "5110", "title": "Essentials of Data Science", "credits": 4 },
+          { "type": "course", "subject": "DS", "number": "5500", "title": "Data Science Capstone", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Core Algorithms (choose 1)",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "CS", "number": "5800", "title": "Algorithms", "credits": 4 },
+          { "type": "course", "subject": "EECE", "number": "7205", "title": "Fundamentals of Computer Engineering", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Core Machine Learning (choose 1)",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "CS", "number": "6140", "title": "Machine Learning", "credits": 4 },
+          { "type": "course", "subject": "EECE", "number": "5644", "title": "Intro to Machine Learning and Pattern Recognition", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "CS Concentration (choose 4)",
+        "n": 4,
+        "children": [
+          { "type": "course", "subject": "CS", "number": "5100", "title": "Foundations of Artificial Intelligence", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5180", "title": "Reinforcement Learning and Sequential Decision Making", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5200", "title": "Database Management Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5330", "title": "Pattern Recognition and Computer Vision", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5340", "title": "Computer/Human Interaction", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5610", "title": "Web Development", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6120", "title": "Natural Language Processing", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6200", "title": "Information Retrieval", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6220", "title": "Data Mining Techniques", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6240", "title": "Large-Scale Parallel Data Processing", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6350", "title": "Empirical Research Methods", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6620", "title": "Fundamentals of Cloud Computing", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "6650", "title": "Building Scalable Distributed Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7140", "title": "Advanced Machine Learning", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7150", "title": "Deep Learning", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7180", "title": "Special Topics in Artificial Intelligence", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7200", "title": "Statistical Methods for Computer Science", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7250", "title": "Information Visualization", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7290", "title": "Special Topics in Data Science", "credits": 4 }
+        ]
+      }
+    ]
+  }
+}
