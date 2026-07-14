@@ -225,7 +225,7 @@ export function RequirementChecker() {
   }, [program, completed, planned, milestoneChecks, nupathChecks]);
 
   function handleImport(result: ParsedTranscript) {
-    if (result.program) setProgram(result.program);
+    if (result.program && isProgramId(result.program)) setProgram(result.program);
     setCompleted(result.completed);
     setPlanned(result.inProgress);
   }
@@ -528,8 +528,8 @@ export function RequirementChecker() {
             <AlertCircle className="w-5 h-5" /> Missing Requirements
           </h3>
           <ul className="space-y-1 text-sm text-amber-700 dark:text-amber-400">
-            {analysis.missing.map((m) => (
-              <li key={m.label} className="flex items-center gap-2">
+            {analysis.missing.map((m, i) => (
+              <li key={`${m.label}:${i}`} className="flex items-center gap-2">
                 <span className="font-semibold">{m.label}</span>
                 <span className="text-amber-500 text-xs">{m.detail}</span>
               </li>
