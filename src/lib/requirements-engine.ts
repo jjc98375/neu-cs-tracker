@@ -313,5 +313,3 @@ export function analyzeGraduation(
     onTrack,
   };
 }
-
-export type { ProgramV2 };
