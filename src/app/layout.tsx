@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NEU Grad Planner",
-  description: "Northeastern University course browser and graduation planner",
+  title: "Khoury Grad Planner",
+  description: "Khoury College course browser and graduation planner (undergrad, master's, PhD)",
 };
 
 export default function RootLayout({
@@ -40,7 +40,7 @@ export default function RootLayout({
                   height={32}
                   className="h-8 w-8 rounded-full object-cover ring-2 ring-red-500/70"
                 />
-                NEU Grad Planner
+                Khoury Grad Planner
               </Link>
               <nav className="flex gap-1">
                 <Link

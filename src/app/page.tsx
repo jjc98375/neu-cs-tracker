@@ -15,11 +15,12 @@ export default function Home() {
           className="h-16 w-16 rounded-full object-cover ring-2 ring-red-500/70 mb-4"
         />
         <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3">
-          <span className="text-red-600 dark:text-red-400">NEU</span> Grad Planner
+          <span className="text-red-600 dark:text-red-400">Khoury</span> Grad Planner
         </h1>
         <p className="text-lg text-slate-500 dark:text-slate-400">
-          Browse Northeastern CS courses, check campus availability and summer
-          sessions, and plan your path to graduation.
+          Browse Khoury College courses, check campus availability and summer
+          sessions, and track graduation requirements for undergrad, master&apos;s,
+          and PhD programs.
         </p>
       </div>
 
@@ -59,7 +60,7 @@ export default function Home() {
             and planned courses to estimate your graduation date.
           </p>
           <div className="mt-4 flex gap-2 text-xs">
-            {["MS CS", "MS AI", "MS DS"].map((p) => (
+            {["Undergrad", "Master's", "PhD"].map((p) => (
               <span
                 key={p}
                 className="bg-red-50 text-red-700 border border-red-100 px-2 py-0.5 rounded"

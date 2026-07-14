@@ -1,8 +1,8 @@
 @AGENTS.md
 
-# NEU CS Tracker
+# Khoury Grad Planner
 
-Course browser and graduation planner for Northeastern University CS graduate students.
+Course browser and graduation planner for Khoury College students (undergrad, master's, PhD).
 Built with **Next.js 16.2.1**, **React 19**, **TypeScript**, **Tailwind CSS 4**, **SWR**.
 
 ## Architecture
@@ -30,7 +30,10 @@ src/
   lib/
     types.ts                       # All TypeScript interfaces
     banner-api.ts                  # Server-side Banner API client + helpers
-    requirements.ts                # Graduation requirements engine (MSCS, MSAI, MSDS)
+    program-schema.ts              # Recursive requirement schema (ProgramV2)
+    requirements-engine.ts         # Requirements interpreter + course allocation
+  data/
+    programs/                      # Program JSON files + registry
 __tests__/                         # Vitest tests (104 passing)
 ```
 
@@ -60,12 +63,19 @@ Base URL: `https://nubanner.neu.edu/StudentRegistrationSsb/ssb`
 
 ## Graduation Requirements Engine
 
-`lib/requirements.ts` defines three programs:
-- **MSCS** (32 credits): Breadth requirements (Systems, Theory, AI, SE groups), capstone
-- **MSAI** (32 credits): 3 required + 5 electives from a pool
-- **MSDS** (32 credits): 4 required core + analytics/computation depth + electives
+`src/lib/program-schema.ts` defines the recursive requirement schema (ProgramV2:
+course / range / allOf / chooseN / chooseCredits nodes + PhD milestones + UG NUpath
+checklist). Program data lives in `src/data/programs/*.json` (one file per program,
+with catalogUrl/catalogYear/verifiedAt provenance), registered in
+`src/data/programs/index.ts` (`PROGRAMS`, `PROGRAM_IDS`, legacy-ID mapping).
 
-`analyzeGraduation(programId, completed, planned)` returns credit totals, requirement statuses, missing courses, on-track boolean, and projected graduation term.
+`src/lib/requirements-engine.ts` interprets the tree: completed/planned courses are
+allocated to leaves (each course used at most once; exact course leaves claim before
+ranges), statuses evaluate bottom-up, and `analyzeGraduation(program, completed,
+planned)` returns credit totals, a nested status tree, a missing list, and a
+level-paced expected graduation term (UG 16 cr/term, MS 8, PhD none).
+
+Design spec: `docs/superpowers/specs/2026-07-12-khoury-programs-design.md`.
 
 ## Transcript Import (auto-fill the planner)
 
