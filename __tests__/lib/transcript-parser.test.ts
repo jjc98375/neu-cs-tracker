@@ -22,9 +22,18 @@ describe("programToId", () => {
     expect(programToId("M.S. in Computer Science")).toBe("mscs");
     expect(programToId("M.S. in Artificial Intelligence")).toBe("msai");
     expect(programToId("M.S. in Data Science")).toBe("msds");
+    expect(programToId("M.S. in Cybersecurity")).toBe("ms-cy");
+    expect(programToId("B.S. in Computer Science")).toBe("bscs");
+    expect(programToId("Bachelor of Arts in Computer Science")).toBe("bacs");
+    expect(programToId("B.S. in Cybersecurity")).toBe("bs-cy");
+    expect(programToId("B.S. in Data Science")).toBe("bs-ds");
+    expect(programToId("Khoury Align M.S. in Computer Science")).toBe("mscs-align");
+    expect(programToId("Ph.D. in Computer Science")).toBe("phd-cs");
+    expect(programToId("Doctor of Philosophy in Cybersecurity")).toBe("phd-cy");
+    expect(programToId("Ph.D. in Personal Health Informatics")).toBe("phd-phi");
   });
   it("returns undefined for unrecognized programs", () => {
-    expect(programToId("M.S. in Cybersecurity")).toBeUndefined();
+    expect(programToId("M.S. in Underwater Basket Weaving")).toBeUndefined();
     expect(programToId("")).toBeUndefined();
   });
 });

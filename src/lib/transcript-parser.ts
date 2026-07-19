@@ -18,9 +18,26 @@ export function termToCode(term: string): string {
 }
 
 const PROGRAM_MAP: Record<string, ProgramId> = {
+  "b.s. in computer science": "bscs",
+  "bachelor of science in computer science": "bscs",
+  "b.a. in computer science": "bacs",
+  "bachelor of arts in computer science": "bacs",
+  "b.s. in cybersecurity": "bs-cy",
+  "bachelor of science in cybersecurity": "bs-cy",
+  "b.s. in data science": "bs-ds",
+  "bachelor of science in data science": "bs-ds",
   "m.s. in computer science": "mscs",
+  "khoury align m.s. in computer science": "mscs-align",
+  "align m.s. in computer science": "mscs-align",
   "m.s. in artificial intelligence": "msai",
   "m.s. in data science": "msds",
+  "m.s. in cybersecurity": "ms-cy",
+  "ph.d. in computer science": "phd-cs",
+  "doctor of philosophy in computer science": "phd-cs",
+  "ph.d. in cybersecurity": "phd-cy",
+  "doctor of philosophy in cybersecurity": "phd-cy",
+  "ph.d. in personal health informatics": "phd-phi",
+  "doctor of philosophy in personal health informatics": "phd-phi",
 };
 
 export function programToId(program: string): ProgramId | undefined {
