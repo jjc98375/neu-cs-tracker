@@ -1,3 +1,6 @@
-# Local Python venv / artifacts (Project 1 has no ingestion pipeline)
-.claude/
-data/
+# Local Python venv / artifacts (Project 1 has no ingestion pipeline).
+# Leading slashes are required: an unanchored "data/" also matches src/data/,
+# which holds the program JSON the requirements page imports.
+/.claude/
+/data/
+/ingestion/
