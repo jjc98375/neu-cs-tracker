@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { RequirementTree } from "@/components/RequirementTree";
 import { evaluateTree } from "@/lib/requirements-engine";
 import type { RequirementNode } from "@/lib/program-schema";
+import { PROGRAMS, PROGRAM_IDS } from "@/data/programs";
 
 const TREE: RequirementNode = {
   type: "allOf",
@@ -78,5 +79,17 @@ describe("RequirementTree", () => {
     rerender(<RequirementTree status={evaluateTree(OTHER, [], [])} />);
     // Fresh group identity → mounts expanded, its children visible.
     expect(screen.getByText("DS 5110")).toBeDefined();
+  });
+});
+
+describe("RequirementTree renders every registered program", () => {
+  it.each(PROGRAM_IDS.map((id) => [id] as const))("%s renders without crashing", (id) => {
+    const status = evaluateTree(PROGRAMS[id].requirements, [], []);
+    const { unmount } = render(<RequirementTree status={status} />);
+    const node = PROGRAMS[id].requirements;
+    if (node.type !== "course" && node.type !== "range") {
+      expect(screen.getAllByText(node.label).length).toBeGreaterThan(0);
+    }
+    unmount();
   });
 });

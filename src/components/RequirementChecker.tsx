@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { CompletedCourse, PlannedCourse } from "@/lib/types";
-import { PROGRAMS, PROGRAM_IDS, LEGACY_PROGRAM_IDS, isProgramId, type ProgramId } from "@/data/programs";
+import { PROGRAMS, LEGACY_PROGRAM_IDS, isProgramId, type ProgramId } from "@/data/programs";
 import { analyzeGraduation } from "@/lib/requirements-engine";
 import { RequirementTree } from "@/components/RequirementTree";
 import { CheckCircle, Clock, AlertCircle, Plus, Trash2, Pencil, GraduationCap, TrendingUp } from "lucide-react";
@@ -11,6 +11,7 @@ import { TranscriptImport } from "@/components/TranscriptImport";
 import type { ParsedTranscript } from "@/lib/transcript-parser";
 import { CourseAutocomplete } from "@/components/CourseAutocomplete";
 import { MilestoneChecklist } from "@/components/MilestoneChecklist";
+import ProgramPicker from "@/components/ProgramPicker";
 
 const STORAGE_KEY = "neu-cs-tracker:planner";
 
@@ -244,22 +245,7 @@ export function RequirementChecker() {
     <div className="space-y-6">
       <TranscriptImport onImport={handleImport} />
       {/* Program selector */}
-      <div className="flex flex-wrap gap-3">
-        {PROGRAM_IDS.map((pid) => (
-          <button
-            key={pid}
-            onClick={() => setProgram(pid)}
-            className={clsx(
-              "px-4 py-2 rounded-lg border text-sm font-medium transition-colors",
-              program === pid
-                ? "bg-red-600 dark:bg-red-500 text-white border-red-600 dark:border-red-500"
-                : "bg-white dark:bg-[#1e2537] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-[#243049] hover:border-red-400 dark:hover:border-red-500"
-            )}
-          >
-            {PROGRAMS[pid].name}
-          </button>
-        ))}
-      </div>
+      <ProgramPicker value={program} onChange={setProgram} />
 
       {/* Progress summary */}
       <div className="bg-white dark:bg-[#161c2d] border border-slate-200 dark:border-[#243049] rounded-xl p-5">
