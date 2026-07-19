@@ -1,0 +1,172 @@
+{
+  "id": "phd-cy",
+  "name": "PhD in Cybersecurity",
+  "level": "PhD",
+  "totalCredits": 48,
+  "minGpa": 3.0,
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/cybersecurity/cybersecurity-bachelors-degree-entrance-phd/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
+  "requirements": {
+    "type": "allOf",
+    "label": "PhD in Cybersecurity (48 SH beyond the bachelor's degree)",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Core: Foundations (grade of B or higher in each; 3.500 core GPA)",
+        "children": [
+          { "type": "course", "subject": "CY", "number": "5240", "title": "Cyberlaw: Privacy, Ethics, and Digital Rights", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Software Security",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CY", "number": "5770", "title": "Software Vulnerabilities and Security", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "5641", "title": "Introduction to Software Security", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Network / Hardware Security",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CY", "number": "6740", "title": "Network Security", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "5699", "title": "Computer Hardware and System Security", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Tracks: at least two courses from one track",
+        "n": 1,
+        "children": [
+          {
+            "type": "chooseN",
+            "label": "Hardware Security",
+            "n": 2,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "6410", "title": "Compilers", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "5666", "title": "Digital Signal Processing", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7352", "title": "Computer Architecture", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7364", "title": "Mobile and Wireless Networking", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7390", "title": "Computer Hardware Security", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Machine Learning",
+            "n": 2,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "5700", "title": "Fundamentals of Computer Networking", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6140", "title": "Machine Learning", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7150", "title": "Deep Learning", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "5644", "title": "Introduction to Machine Learning and Pattern Recognition", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7397", "title": "Advanced Machine Learning", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Network Security",
+            "n": 2,
+            "children": [
+              { "type": "course", "subject": "CY", "number": "6740", "title": "Network Security", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7610", "title": "Foundations of Distributed Systems", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7775", "title": "Seminar in Computer Security", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "5130", "title": "Computer System Security", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "5155", "title": "Wireless Sensor Networks and the Internet of Things", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "5576", "title": "Wireless Communication Systems", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7336", "title": "Digital Communications", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7364", "title": "Mobile and Wireless Networking", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7374", "title": "Fundamentals of Computer Networks", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Systems Security",
+            "n": 2,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "6410", "title": "Compilers", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7600", "title": "Intensive Computer Systems", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7610", "title": "Foundations of Distributed Systems", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "5130", "title": "Computer System Security", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "6740", "title": "Network Security", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "6760", "title": "Wireless and Mobile Systems Security", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7352", "title": "Computer Architecture", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Theory",
+            "n": 2,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "7800", "title": "Advanced Algorithms", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7805", "title": "Complexity Theory", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7810", "title": "Foundations of Cryptography", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7870", "title": "Seminar in Theoretical Computer Science", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7337", "title": "Information Theory", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Usable Security and Privacy",
+            "n": 2,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "6350", "title": "Empirical Research Methods", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6760", "title": "Privacy, Security, and Usability", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7340", "title": "Theory and Methods in Human Computer Interaction", "credits": 4 },
+              { "type": "course", "subject": "INSH", "number": "6300", "title": "Research Methods in the Social Sciences", "credits": 4 },
+              { "type": "course", "subject": "INSH", "number": "6302", "title": "Qualitative Methods", "credits": 4 },
+              { "type": "course", "subject": "INSH", "number": "6500", "title": "Statistical Analysis", "credits": 4 },
+              { "type": "course", "subject": "INSH", "number": "7400", "title": "Quantitative Analysis", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Cybersecurity Policy",
+            "n": 2,
+            "children": [
+              { "type": "course", "subject": "CRIM", "number": "6200", "title": "Criminology", "credits": 4 },
+              { "type": "course", "subject": "CRIM", "number": "6262", "title": "Evidence-Based Crime Policy", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "5200", "title": "Security Risk Management and Assessment", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "5210", "title": "Information System Forensics", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "5250", "title": "Decision Making for Critical Infrastructure", "credits": 4 },
+              { "type": "course", "subject": "POLS", "number": "7341", "title": "Security and Resilience Policy", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseCredits",
+        "label": "Electives: advisor-approved graduate courses (CRIM, CS, CY, DS, EECE, INSH, MATH, POLS)",
+        "credits": 28,
+        "children": [
+          { "type": "range", "subject": "CRIM", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate CRIM courses" },
+          { "type": "range", "subject": "CS", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate CS courses" },
+          { "type": "range", "subject": "CY", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate CY courses" },
+          { "type": "range", "subject": "DS", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate DS courses" },
+          { "type": "range", "subject": "EECE", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate EECE courses" },
+          { "type": "range", "subject": "INSH", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate INSH courses" },
+          { "type": "range", "subject": "MATH", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate MATH courses" },
+          { "type": "range", "subject": "POLS", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate POLS courses" }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Dissertation",
+        "children": [
+          { "type": "course", "subject": "CY", "number": "9990", "title": "Dissertation Term 1", "credits": 0 },
+          { "type": "course", "subject": "CY", "number": "9991", "title": "Dissertation Term 2", "credits": 0 }
+        ]
+      }
+    ]
+  },
+  "milestones": [
+    { "id": "teaching", "label": "Teaching", "description": "Complete the doctoral teaching requirement." },
+    { "id": "qualifying", "label": "Qualifying exam and area exam", "description": "Pass the qualifying examination and the area examination." },
+    { "id": "annual-review", "label": "Annual review", "description": "Pass the annual research progress review." },
+    { "id": "proposal", "label": "Dissertation proposal", "description": "Submit and present a written dissertation proposal to the dissertation committee." },
+    { "id": "committee", "label": "Dissertation committee", "description": "Form the dissertation committee." },
+    { "id": "defense", "label": "Dissertation defense", "description": "Complete and publicly defend the doctoral dissertation." }
+  ]
+}

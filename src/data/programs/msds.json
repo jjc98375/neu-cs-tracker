@@ -4,63 +4,144 @@
   "level": "MS",
   "totalCredits": 32,
   "minGpa": 3.0,
-  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/data-science/data-science-ms/",
-  "catalogYear": "2024-2026",
-  "verifiedAt": "2026-07-12",
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/university-interdisciplinary-programs/science-data-ms-bos/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
   "requirements": {
     "type": "allOf",
     "label": "MS in Data Science",
     "children": [
       {
         "type": "allOf",
-        "label": "Core",
+        "label": "Data Science Core",
         "children": [
           { "type": "course", "subject": "DS", "number": "5110", "title": "Essentials of Data Science", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Algorithms",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "5800", "title": "Algorithms", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "7205", "title": "Fundamentals of Computer Engineering", "credits": 4 }
+            ]
+          },
+          {
+            "type": "chooseN",
+            "label": "Machine Learning",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "6140", "title": "Machine Learning", "credits": 4 },
+              { "type": "course", "subject": "EECE", "number": "5644", "title": "Introduction to Machine Learning and Pattern Recognition", "credits": 4 }
+            ]
+          },
           { "type": "course", "subject": "DS", "number": "5500", "title": "Data Science Capstone", "credits": 4 }
         ]
       },
       {
         "type": "chooseN",
-        "label": "Core Algorithms (choose 1)",
+        "label": "Concentration (choose one)",
         "n": 1,
         "children": [
-          { "type": "course", "subject": "CS", "number": "5800", "title": "Algorithms", "credits": 4 },
-          { "type": "course", "subject": "EECE", "number": "7205", "title": "Fundamentals of Computer Engineering", "credits": 4 }
-        ]
-      },
-      {
-        "type": "chooseN",
-        "label": "Core Machine Learning (choose 1)",
-        "n": 1,
-        "children": [
-          { "type": "course", "subject": "CS", "number": "6140", "title": "Machine Learning", "credits": 4 },
-          { "type": "course", "subject": "EECE", "number": "5644", "title": "Intro to Machine Learning and Pattern Recognition", "credits": 4 }
-        ]
-      },
-      {
-        "type": "chooseN",
-        "label": "CS Concentration (choose 4)",
-        "n": 4,
-        "children": [
-          { "type": "course", "subject": "CS", "number": "5100", "title": "Foundations of Artificial Intelligence", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5180", "title": "Reinforcement Learning and Sequential Decision Making", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5200", "title": "Database Management Systems", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5330", "title": "Pattern Recognition and Computer Vision", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5340", "title": "Computer/Human Interaction", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5610", "title": "Web Development", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6120", "title": "Natural Language Processing", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6200", "title": "Information Retrieval", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6220", "title": "Data Mining Techniques", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6240", "title": "Large-Scale Parallel Data Processing", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6350", "title": "Empirical Research Methods", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6620", "title": "Fundamentals of Cloud Computing", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "6650", "title": "Building Scalable Distributed Systems", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7140", "title": "Advanced Machine Learning", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7150", "title": "Deep Learning", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7180", "title": "Special Topics in Artificial Intelligence", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7200", "title": "Statistical Methods for Computer Science", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7250", "title": "Information Visualization", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "7290", "title": "Special Topics in Data Science", "credits": 4 }
+          {
+            "type": "chooseCredits",
+            "label": "Computer Science Concentration (Khoury College)",
+            "credits": 16,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "5100", "title": "Foundations of Artificial Intelligence", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "5180", "title": "Reinforcement Learning and Sequential Decision Making", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "5200", "title": "Database Management Systems", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "5330", "title": "Pattern Recognition and Computer Vision", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "5340", "title": "Computer/Human Interaction", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "5610", "title": "Web Development", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6120", "title": "Natural Language Processing", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6200", "title": "Information Retrieval", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6220", "title": "Data Mining Techniques", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6240", "title": "Large-Scale Parallel Data Processing", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6350", "title": "Empirical Research Methods", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6620", "title": "Fundamentals of Cloud Computing", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "6650", "title": "Building Scalable Distributed Systems", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7140", "title": "Advanced Machine Learning", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7150", "title": "Deep Learning", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7180", "title": "Special Topics in Artificial Intelligence", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7200", "title": "Statistical Methods for Computer Science", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7250", "title": "Information Visualization: Theory and Applications", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7280", "title": "Special Topics in Database Management", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7290", "title": "Special Topics in Data Science", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7990", "title": "Thesis", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "8674", "title": "Master's Project", "credits": 4 },
+              { "type": "course", "subject": "DS", "number": "7995", "title": "Project", "credits": 4 }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Engineering Theory and Modeling Concentration (College of Engineering)",
+            "children": [
+              {
+                "type": "chooseCredits",
+                "label": "Foundational Courses",
+                "credits": 4,
+                "children": [
+                  { "type": "course", "subject": "DS", "number": "7995", "title": "Project", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5360", "title": "Combinatorial Optimization", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5612", "title": "Statistical Inference: An Introduction for Engineers and Data Analysts", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7204", "title": "Applied Probability and Stochastic Processes", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7323", "title": "Numerical Optimization Methods", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7337", "title": "Information Theory", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7346", "title": "Probabilistic System Modeling and Analysis", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "6400", "title": "Foundations for Data Analytics Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7275", "title": "Data Mining in Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7280", "title": "Statistical Methods in Engineering", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseCredits",
+                "label": "Translational and Advanced Courses",
+                "credits": 12,
+                "children": [
+                  { "type": "course", "subject": "BIOE", "number": "5750", "title": "Modeling and Inference in Bioengineering", "credits": 4 },
+                  { "type": "course", "subject": "BIOE", "number": "5880", "title": "Computational Methods in Systems Bioengineering", "credits": 4 },
+                  { "type": "course", "subject": "BIOE", "number": "6200", "title": "Mathematical Methods in Bioengineering", "credits": 4 },
+                  { "type": "course", "subject": "CHME", "number": "5137", "title": "Computational Modeling in Chemical Engineering", "credits": 4 },
+                  { "type": "course", "subject": "CHME", "number": "5649", "title": "Numerical Strategies and Data Analytics for Chemical Sciences", "credits": 4 },
+                  { "type": "course", "subject": "CIVE", "number": "7100", "title": "Time Series and Geospatial Data Sciences", "credits": 4 },
+                  { "type": "course", "subject": "CIVE", "number": "7150", "title": "Data-Driven Decision Support for Civil and Environmental Engineering", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5360", "title": "Combinatorial Optimization", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5612", "title": "Statistical Inference: An Introduction for Engineers and Data Analysts", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5614", "title": "Reinforcement Learning and Decision Making Under Uncertainty", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5626", "title": "Image Processing and Pattern Recognition", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5639", "title": "Computer Vision", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5640", "title": "High-Performance Computing", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5642", "title": "Data Visualization", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5645", "title": "Parallel Processing for Data Analytics", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7204", "title": "Applied Probability and Stochastic Processes", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7215", "title": "Introduction to Distributed Intelligence", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7223", "title": "Riemannian Optimization", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7323", "title": "Numerical Optimization Methods", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7337", "title": "Information Theory", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7345", "title": "Big Data and Sparsity in Control, Machine Learning, and Optimization", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7346", "title": "Probabilistic System Modeling and Analysis", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7370", "title": "Advanced Computer Vision", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7397", "title": "Advanced Machine Learning", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7945", "title": "Master's Project", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "5137", "title": "Computational Modeling in Industrial Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "5390", "title": "Structured Data Analytics for Industrial Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "5630", "title": "Biosensor and Human Behavior Measurement", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "5640", "title": "Data Mining for Engineering Applications", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "6400", "title": "Foundations for Data Analytics Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "6600", "title": "Computation and Visualization for Analytics", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "6700", "title": "Data Management for Analytics", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "6750", "title": "Data Warehousing and Integration", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7270", "title": "Intelligent Manufacturing", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7275", "title": "Data Mining in Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7280", "title": "Statistical Methods in Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7295", "title": "Applied Reinforcement Learning in Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7300", "title": "Statistical Learning for Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7500", "title": "Applied Natural Language Processing in Engineering", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7615", "title": "Neural Networks and Deep Learning", "credits": 4 }
+                ]
+              }
+            ]
+          }
         ]
       }
     ]

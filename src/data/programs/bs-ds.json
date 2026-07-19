@@ -1,0 +1,221 @@
+{
+  "id": "bs-ds",
+  "name": "BS in Data Science",
+  "level": "UG",
+  "totalCredits": 133,
+  "minGpa": 2.0,
+  "catalogUrl": "https://catalog.northeastern.edu/undergraduate/computer-information-science/data-science/data-science-bs/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
+  "requirements": {
+    "type": "allOf",
+    "label": "BS in Data Science",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Computer Science Overview",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "1200", "title": "First Year Seminar", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "1210", "title": "Professional Development for Khoury Co-op", "credits": 1 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Fundamental Courses",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "1800", "title": "Discrete Structures", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "1802", "title": "Seminar for CS 1800", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "2000", "title": "Introduction to Program Design and Implementation", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "2001", "title": "Lab for CS 2000", "credits": 1 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Programming Sequence Pathways",
+        "n": 1,
+        "children": [
+          {
+            "type": "allOf",
+            "label": "Computer Science Option",
+            "children": [
+              { "type": "course", "subject": "CS", "number": "2100", "title": "Program Design and Implementation 1", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "2101", "title": "Lab for CS 2100", "credits": 1 },
+              { "type": "course", "subject": "CS", "number": "3100", "title": "Program Design and Implementation 2", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "3101", "title": "Lab for CS 3100", "credits": 1 }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Data Science Option",
+            "children": [
+              { "type": "course", "subject": "DS", "number": "2500", "title": "Intermediate Programming with Data", "credits": 4 },
+              { "type": "course", "subject": "DS", "number": "2501", "title": "Lab for DS 2500", "credits": 1 },
+              { "type": "course", "subject": "DS", "number": "3500", "title": "Advanced Programming with Data", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Computer Science Required Courses",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "3000", "title": "Algorithms and Data", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "3200", "title": "Introduction to Databases", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "C++ or Computer Systems",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "3520", "title": "Programming in C++", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "3650", "title": "Computer Systems", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Data Science Electives",
+        "n": 3,
+        "children": [
+          { "type": "course", "subject": "CS", "number": "4100", "title": "Artificial Intelligence", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "4120", "title": "Natural Language Processing", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "4130", "title": "Engineering LLM-Integrated Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "4220", "title": "Information Retrieval", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "4100", "title": "AI Security and Privacy", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Data Science Required Courses",
+        "children": [
+          { "type": "course", "subject": "DS", "number": "3000", "title": "Foundations of Data Science", "credits": 4 },
+          { "type": "course", "subject": "DS", "number": "4200", "title": "Information Presentation and Visualization", "credits": 4 },
+          { "type": "course", "subject": "DS", "number": "4300", "title": "Large-Scale Information Storage and Retrieval", "credits": 4 },
+          { "type": "course", "subject": "DS", "number": "4400", "title": "Machine Learning and Data Mining 1", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "ML 2 or Neural Networks",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "DS", "number": "4420", "title": "Machine Learning and Data Mining 2", "credits": 4 },
+              { "type": "course", "subject": "DS", "number": "4440", "title": "Practical Neural Networks", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Presentation Requirement",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "COMM", "number": "1112", "title": "Public Speaking", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1113", "title": "Business and Professional Speaking", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1210", "title": "Persuasion and Rhetoric", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1511", "title": "Communication and Storytelling", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1125", "title": "Improvisation", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1130", "title": "Introduction to Acting", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1180", "title": "Dynamic Presence: Theatre Training for Effective Interpersonal Interactions", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "2345", "title": "Acting for the Camera", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Mathematics Foundations",
+        "children": [
+          { "type": "course", "subject": "MATH", "number": "1341", "title": "Calculus 1 for Science and Engineering", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "1342", "title": "Calculus 2 for Science and Engineering", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "2331", "title": "Linear Algebra", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "3081", "title": "Probability and Statistics", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Data Science and Ethics",
+        "children": [
+          { "type": "course", "subject": "PHIL", "number": "1145", "title": "Technology and Human Values", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseCredits",
+        "label": "Khoury Approved Electives",
+        "credits": 4,
+        "children": [
+          { "type": "range", "subject": "CS", "minNumber": 2500, "maxNumber": 7999, "creditsPer": 4, "label": "CS 2500 or higher (except CS 5010)" },
+          { "type": "range", "subject": "CY", "minNumber": 2000, "maxNumber": 7999, "creditsPer": 4, "label": "CY 2000 or higher (except CY 4930)" },
+          { "type": "range", "subject": "DS", "minNumber": 2500, "maxNumber": 7999, "creditsPer": 4, "label": "DS 2500 or higher (except DS 4900)" },
+          { "type": "course", "subject": "MKTG", "number": "4606", "title": "Digital, Analytics, Technology, and Automation Research Practicum", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Data Science Related Electives in Other Units",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "ARTG", "number": "3451", "title": "Information Design 1", "credits": 4 },
+          { "type": "course", "subject": "ARTG", "number": "5100", "title": "Information Design Studio 1: Principles", "credits": 4 },
+          { "type": "course", "subject": "ARTG", "number": "5110", "title": "Information Design History", "credits": 4 },
+          { "type": "course", "subject": "ARTG", "number": "5120", "title": "Research Methods for Design", "credits": 4 },
+          { "type": "course", "subject": "ARTG", "number": "5330", "title": "Visualization Technologies 1: Fundamentals", "credits": 4 },
+          { "type": "course", "subject": "ARTG", "number": "6100", "title": "Information Design Studio 2: Dynamic Mapping and Models", "credits": 4 },
+          { "type": "course", "subject": "BINF", "number": "6308", "title": "Bioinformatics Computational Methods 1", "credits": 4 },
+          { "type": "course", "subject": "BINF", "number": "6309", "title": "Bioinformatics Computational Methods 2", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "4350", "title": "Empirical Research Methods", "credits": 4 },
+          { "type": "course", "subject": "ECON", "number": "2350", "title": "Statistics for Economists", "credits": 4 },
+          { "type": "course", "subject": "ECON", "number": "2560", "title": "Applied Econometrics", "credits": 4 },
+          { "type": "course", "subject": "EECE", "number": "5639", "title": "Computer Vision", "credits": 4 },
+          { "type": "course", "subject": "EECE", "number": "5642", "title": "Data Visualization", "credits": 4 },
+          { "type": "course", "subject": "EECE", "number": "5644", "title": "Introduction to Machine Learning and Pattern Recognition", "credits": 4 },
+          { "type": "course", "subject": "ENVR", "number": "2500", "title": "Biostatistics", "credits": 4 },
+          { "type": "course", "subject": "GSND", "number": "5110", "title": "Game Design and Analysis", "credits": 4 },
+          { "type": "course", "subject": "GSND", "number": "6350", "title": "Data-Driven Game Design", "credits": 4 },
+          { "type": "course", "subject": "HINF", "number": "5101", "title": "Introduction to Health Informatics and Health Information Systems", "credits": 4 },
+          { "type": "course", "subject": "HINF", "number": "5102", "title": "Data Management in Healthcare", "credits": 4 },
+          { "type": "course", "subject": "HINF", "number": "5300", "title": "Personal Health Interface Design and Development", "credits": 4 },
+          { "type": "course", "subject": "HINF", "number": "5301", "title": "Evaluating Health Technologies", "credits": 4 },
+          { "type": "course", "subject": "IE", "number": "5640", "title": "Data Mining for Engineering Applications", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "2321", "title": "Calculus 3 for Science and Engineering", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "4581", "title": "Statistics and Stochastic Processes", "credits": 4 },
+          { "type": "course", "subject": "MGSC", "number": "2301", "title": "Business Statistics", "credits": 4 },
+          { "type": "course", "subject": "MISM", "number": "3403", "title": "Data Management for Business", "credits": 4 },
+          { "type": "course", "subject": "MKTG", "number": "3401", "title": "Marketing Research", "credits": 4 },
+          { "type": "course", "subject": "MKTG", "number": "3501", "title": "Marketing Analytics", "credits": 4 },
+          { "type": "course", "subject": "PHIL", "number": "5005", "title": "Information Ethics", "credits": 4 },
+          { "type": "course", "subject": "PHIL", "number": "5010", "title": "AI Ethics", "credits": 4 },
+          { "type": "course", "subject": "PSYC", "number": "2320", "title": "Statistics in Psychological Research", "credits": 4 },
+          { "type": "course", "subject": "PSYC", "number": "3466", "title": "Cognition", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Writing Requirements",
+        "children": [
+          { "type": "course", "subject": "ENGW", "number": "1111", "title": "First-Year Writing", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Advanced Writing in the Disciplines",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "ENGW", "number": "3302", "title": "Advanced Writing in the Technical Professions", "credits": 4 },
+              { "type": "course", "subject": "ENGW", "number": "3315", "title": "Interdisciplinary Advanced Writing in the Disciplines", "credits": 4 }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "infoChecklist": [
+    { "id": "nupath-nd", "label": "Engaging with the Natural and Designed World (ND)" },
+    { "id": "nupath-ei", "label": "Exploring Creative Expression and Innovation (EI)" },
+    { "id": "nupath-ic", "label": "Interpreting Culture (IC)" },
+    { "id": "nupath-fq", "label": "Conducting Formal and Quantitative Reasoning (FQ)" },
+    { "id": "nupath-si", "label": "Understanding Societies and Institutions (SI)" },
+    { "id": "nupath-ad", "label": "Analyzing and Using Data (AD)" },
+    { "id": "nupath-dd", "label": "Engaging Differences and Diversity (DD)" },
+    { "id": "nupath-er", "label": "Employing Ethical Reasoning (ER)" },
+    { "id": "nupath-wf", "label": "Writing in the First Year (WF)" },
+    { "id": "nupath-wd", "label": "Advanced Writing in the Disciplines (WD)" },
+    { "id": "nupath-wi", "label": "Writing-Intensive in the Major (WI, two courses)" },
+    { "id": "nupath-ex", "label": "Integrating Knowledge and Skills Through Experience (EX)" },
+    { "id": "nupath-ce", "label": "Demonstrating Thought and Action in a Capstone (CE)" }
+  ]
+}

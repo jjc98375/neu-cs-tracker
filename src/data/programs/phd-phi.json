@@ -1,0 +1,67 @@
+{
+  "id": "phd-phi",
+  "name": "PhD in Personal Health Informatics",
+  "level": "PhD",
+  "totalCredits": 48,
+  "minGpa": 3.0,
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/interdisciplinary/personal-health-informatics-phd/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
+  "requirements": {
+    "type": "allOf",
+    "label": "PhD in Personal Health Informatics",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Core Requirements (grade of B or higher in each; 3.500 core GPA)",
+        "children": [
+          { "type": "course", "subject": "HINF", "number": "5200", "title": "Theoretical Foundations in Personal Health Informatics", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5010", "title": "Programming Design Paradigm (or another programming course)", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7340", "title": "Theory and Methods in Human Computer Interaction", "credits": 4 },
+          { "type": "course", "subject": "HINF", "number": "5300", "title": "Personal Health Interface Design and Development", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7300", "title": "Empirical Research Methods for Human Computer Interaction", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Statistics",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CAEP", "number": "7712", "title": "Intermediate Statistical Data Analysis Techniques", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "7200", "title": "Statistical Methods for Computer Science", "credits": 4 },
+              { "type": "course", "subject": "PHTH", "number": "5210", "title": "Biostatistics in Public Health", "credits": 3 },
+              { "type": "course", "subject": "PHTH", "number": "6440", "title": "Advanced Methods in Biostatistics", "credits": 4 }
+            ]
+          },
+          { "type": "course", "subject": "HINF", "number": "5301", "title": "Evaluating Health Technologies", "credits": 4 },
+          { "type": "course", "subject": "HINF", "number": "8982", "title": "Readings (user-interface practicum)", "credits": 1 }
+        ]
+      },
+      {
+        "type": "chooseCredits",
+        "label": "Electives: 12-17 SH in CAEP, CS, HINF, HLTH, or PHTH (see faculty advisor for other acceptable courses)",
+        "credits": 12,
+        "children": [
+          { "type": "range", "subject": "CAEP", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate CAEP courses" },
+          { "type": "range", "subject": "CS", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate CS courses" },
+          { "type": "range", "subject": "HINF", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate HINF courses" },
+          { "type": "range", "subject": "HLTH", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate HLTH courses" },
+          { "type": "range", "subject": "PHTH", "minNumber": 5000, "maxNumber": 9989, "creditsPer": 4, "label": "Graduate PHTH courses" }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Dissertation",
+        "children": [
+          { "type": "course", "subject": "HINF", "number": "9990", "title": "Dissertation Term 1", "credits": 0 },
+          { "type": "course", "subject": "HINF", "number": "9991", "title": "Dissertation Term 2", "credits": 0 }
+        ]
+      }
+    ]
+  },
+  "milestones": [
+    { "id": "qualifying", "label": "Qualifying examination", "description": "Pass the three-part qualifying examination." },
+    { "id": "annual-review", "label": "Annual review", "description": "Pass the annual research progress review." },
+    { "id": "proposal", "label": "Dissertation proposal", "description": "Submit a written dissertation proposal to the dissertation committee." },
+    { "id": "committee", "label": "Dissertation committee", "description": "Form the dissertation committee." },
+    { "id": "defense", "label": "Dissertation defense", "description": "Complete and publicly defend the doctoral dissertation." }
+  ]
+}

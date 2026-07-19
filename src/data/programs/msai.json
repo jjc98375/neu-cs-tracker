@@ -4,156 +4,221 @@
   "level": "MS",
   "totalCredits": 32,
   "minGpa": 3.0,
-  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/artificial-intelligence/artificial-intelligence-ms/",
-  "catalogYear": "2024-2026",
-  "verifiedAt": "2026-07-12",
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/computer-science/artificial-intelligence-ms/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
   "requirements": {
     "type": "allOf",
     "label": "MS in Artificial Intelligence",
     "children": [
       {
         "type": "allOf",
-        "label": "Core",
+        "label": "Core Requirements",
         "children": [
+          { "type": "course", "subject": "CS", "number": "5100", "title": "Foundations of Artificial Intelligence", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5130", "title": "Applied Programming and Data Processing for AI", "credits": 4 },
           {
-            "type": "course",
-            "subject": "CS",
-            "number": "5100",
-            "title": "Foundations of Artificial Intelligence",
-            "credits": 4
+            "type": "chooseN",
+            "label": "Mathematics for Machine Learning",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "DADS", "number": "5200", "title": "Mathematics for Machine Learning", "credits": 4 },
+              { "type": "course", "subject": "DS", "number": "5020", "title": "Introduction to Linear Algebra and Probability for Data Science", "credits": 4 }
+            ]
           },
           {
-            "type": "course",
-            "subject": "CS",
-            "number": "5130",
-            "title": "Applied Programming and Data Processing for AI",
-            "credits": 4
+            "type": "chooseN",
+            "label": "Machine Learning",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "EECE", "number": "5644", "title": "Introduction to Machine Learning and Pattern Recognition", "credits": 4 },
+              { "type": "course", "subject": "DADS", "number": "7275", "title": "Machine Learning and Data Analytics", "credits": 4 }
+            ]
           }
         ]
       },
       {
         "type": "chooseN",
-        "label": "Core Math (choose 1)",
+        "label": "Concentration (choose one)",
         "n": 1,
         "children": [
           {
-            "type": "course",
-            "subject": "DADS",
-            "number": "5200",
-            "title": "Mathematics for Machine Learning",
-            "credits": 4
+            "type": "allOf",
+            "label": "Computer Vision Concentration (College of Engineering)",
+            "children": [
+              {
+                "type": "chooseCredits",
+                "label": "Computer Vision courses",
+                "credits": 8,
+                "children": [
+                  { "type": "course", "subject": "EECE", "number": "5550", "title": "Mobile Robotics", "credits": 4 },
+                  {
+                    "type": "chooseN",
+                    "label": "Robotics Sensing and Navigation",
+                    "n": 1,
+                    "children": [
+                      { "type": "course", "subject": "EECE", "number": "5554", "title": "Robotics Sensing and Navigation", "credits": 4 },
+                      { "type": "course", "subject": "ME", "number": "5554", "title": "Robotics Sensing and Navigation", "credits": 4 }
+                    ]
+                  },
+                  { "type": "course", "subject": "EECE", "number": "5614", "title": "Reinforcement Learning and Decision Making Under Uncertainty", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5639", "title": "Computer Vision", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5642", "title": "Data Visualization", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseCredits",
+                "label": "Advanced courses",
+                "credits": 4,
+                "children": [
+                  { "type": "course", "subject": "EECE", "number": "5645", "title": "Parallel Processing for Data Analytics", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7370", "title": "Advanced Computer Vision", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7397", "title": "Advanced Machine Learning", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "7398", "title": "Advanced Special Topics in Electrical and Computer Engineering", "credits": 4 }
+                ]
+              },
+              { "type": "course", "subject": "EECE", "number": "7945", "title": "Master's Project", "credits": 4 }
+            ]
           },
           {
-            "type": "course",
-            "subject": "DS",
-            "number": "5020",
-            "title": "Linear Algebra and Probability for Data Science",
-            "credits": 4
-          }
-        ]
-      },
-      {
-        "type": "chooseN",
-        "label": "Core Machine Learning (choose 1)",
-        "n": 1,
-        "children": [
-          {
-            "type": "course",
-            "subject": "EECE",
-            "number": "5644",
-            "title": "Intro to Machine Learning and Pattern Recognition",
-            "credits": 4
+            "type": "allOf",
+            "label": "Continuous Process Engineering Concentration (College of Engineering)",
+            "children": [
+              {
+                "type": "chooseCredits",
+                "label": "Process engineering sequences",
+                "credits": 8,
+                "children": [
+                  {
+                    "type": "allOf",
+                    "label": "Fundamentals of Chemical Engineering",
+                    "children": [
+                      { "type": "course", "subject": "CHME", "number": "5101", "title": "Fundamentals of Chemical Engineering: Fluid, Heat, and Mass Transfer", "credits": 4 },
+                      { "type": "course", "subject": "CHME", "number": "5102", "title": "Fundamentals of Chemical Engineering: Thermodynamics and Kinetics", "credits": 4 }
+                    ]
+                  },
+                  {
+                    "type": "allOf",
+                    "label": "Process Safety Engineering",
+                    "children": [
+                      { "type": "course", "subject": "CHME", "number": "5510", "title": "Fundamentals in Process Safety Engineering", "credits": 4 },
+                      { "type": "course", "subject": "CHME", "number": "5515", "title": "Process Safety Engineering for Biotechnology and Pharmaceutical Industries", "credits": 4 }
+                    ]
+                  },
+                  {
+                    "type": "allOf",
+                    "label": "Pharmaceutical Engineering",
+                    "children": [
+                      { "type": "course", "subject": "CHME", "number": "7600", "title": "Pharmaceutical Engineering I", "credits": 4 },
+                      { "type": "course", "subject": "CHME", "number": "7601", "title": "Pharmaceutical Engineering II", "credits": 4 }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "chooseCredits",
+                "label": "Elective",
+                "credits": 4,
+                "children": [
+                  {
+                    "type": "allOf",
+                    "label": "Computational Chemistry with Journal Club",
+                    "children": [
+                      { "type": "course", "subject": "CHEM", "number": "5641", "title": "Computational Chemistry", "credits": 3 },
+                      { "type": "course", "subject": "CHME", "number": "7901", "title": "Journal Club in Chemical Engineering", "credits": 1 }
+                    ]
+                  },
+                  { "type": "course", "subject": "CHME", "number": "5137", "title": "Computational Modeling in Chemical Engineering", "credits": 4 },
+                  { "type": "course", "subject": "CHME", "number": "5520", "title": "Designing for Process Safety", "credits": 4 },
+                  { "type": "course", "subject": "CHME", "number": "5649", "title": "Numerical Strategies and Data Analytics for Chemical Sciences", "credits": 4 },
+                  { "type": "course", "subject": "IE", "number": "7270", "title": "Intelligent Manufacturing", "credits": 4 },
+                  { "type": "course", "subject": "PHIL", "number": "5010", "title": "AI Ethics", "credits": 4 },
+                  { "type": "course", "subject": "PHSC", "number": "5900", "title": "AI in Drug Discovery and Development", "credits": 4 }
+                ]
+              },
+              { "type": "course", "subject": "CHME", "number": "6580", "title": "Artificial Intelligence for Process Engineering Capstone", "credits": 4 }
+            ]
           },
           {
-            "type": "course",
-            "subject": "DADS",
-            "number": "7275",
-            "title": "Machine Learning and Data Analytics",
-            "credits": 4
-          }
-        ]
-      },
-      {
-        "type": "chooseN",
-        "label": "Specialization (choose 2)",
-        "n": 2,
-        "children": [
-          {
-            "type": "course",
-            "subject": "CS",
-            "number": "5330",
-            "title": "Pattern Recognition and Computer Vision",
-            "credits": 4
+            "type": "allOf",
+            "label": "Energy Systems Concentration (College of Engineering)",
+            "children": [
+              {
+                "type": "chooseCredits",
+                "label": "Energy systems courses",
+                "credits": 12,
+                "children": [
+                  { "type": "course", "subject": "CHME", "number": "5621", "title": "Electrochemical Engineering", "credits": 4 },
+                  { "type": "course", "subject": "CHME", "number": "5692", "title": "Carbon Capture, Utilization, and Storage", "credits": 4 },
+                  { "type": "course", "subject": "ENSY", "number": "5000", "title": "Fundamentals of Energy System Integration", "credits": 4 },
+                  { "type": "course", "subject": "ENSY", "number": "5700", "title": "Renewable Energy Development", "credits": 4 },
+                  { "type": "course", "subject": "ENSY", "number": "5800", "title": "Applications of Artificial Intelligence in Energy Systems", "credits": 4 },
+                  { "type": "course", "subject": "MATL", "number": "6270", "title": "Principles, Devices, and Materials for Energy Storage and Energy Harvesting", "credits": 4 },
+                  { "type": "course", "subject": "ME", "number": "5374", "title": "Special Topics in Mechanical Engineering", "credits": 4 },
+                  { "type": "course", "subject": "ME", "number": "6200", "title": "Mathematical Methods for Mechanical Engineers 1", "credits": 4 },
+                  { "type": "course", "subject": "PHIL", "number": "5010", "title": "AI Ethics", "credits": 4 }
+                ]
+              },
+              { "type": "course", "subject": "ME", "number": "7945", "title": "Master's Project", "credits": 4 }
+            ]
           },
           {
-            "type": "course",
-            "subject": "EECE",
-            "number": "5639",
-            "title": "Computer Vision",
-            "credits": 4
+            "type": "allOf",
+            "label": "Machine Learning Concentration (Khoury College)",
+            "children": [
+              { "type": "course", "subject": "CS", "number": "5800", "title": "Algorithms", "credits": 4 },
+              {
+                "type": "chooseCredits",
+                "label": "Machine learning courses",
+                "credits": 8,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "5180", "title": "Reinforcement Learning and Sequential Decision Making", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "5330", "title": "Pattern Recognition and Computer Vision", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "6120", "title": "Natural Language Processing", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "6200", "title": "Information Retrieval", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "6220", "title": "Data Mining Techniques", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "7140", "title": "Advanced Machine Learning", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "7150", "title": "Deep Learning", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "7180", "title": "Special Topics in Artificial Intelligence", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseN",
+                "label": "Capstone",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "6170", "title": "AI Capstone", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "8674", "title": "Master's Project", "credits": 4 }
+                ]
+              }
+            ]
           },
           {
-            "type": "course",
-            "subject": "EECE",
-            "number": "7370",
-            "title": "Advanced Computer Vision",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "CS",
-            "number": "7140",
-            "title": "Advanced Machine Learning",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "CS",
-            "number": "7150",
-            "title": "Deep Learning",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "CS",
-            "number": "6220",
-            "title": "Data Mining Techniques",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "DS",
-            "number": "5230",
-            "title": "Unsupervised Machine Learning and Data Mining",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "CS",
-            "number": "5180",
-            "title": "Reinforcement Learning and Sequential Decision Making",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "CS",
-            "number": "5335",
-            "title": "Robotic Science and Systems",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "EECE",
-            "number": "5550",
-            "title": "Mobile Robotics",
-            "credits": 4
-          },
-          {
-            "type": "course",
-            "subject": "EECE",
-            "number": "5554",
-            "title": "Robotics Sensing and Navigation",
-            "credits": 4
+            "type": "allOf",
+            "label": "Robotics and Agent-Based Systems Concentration (Khoury College)",
+            "children": [
+              { "type": "course", "subject": "CS", "number": "5800", "title": "Algorithms", "credits": 4 },
+              {
+                "type": "chooseCredits",
+                "label": "Robotics courses",
+                "credits": 8,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "5180", "title": "Reinforcement Learning and Sequential Decision Making", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "5335", "title": "Robotic Science and Systems", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5550", "title": "Mobile Robotics", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "5554", "title": "Robotics Sensing and Navigation", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseN",
+                "label": "Capstone",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "6170", "title": "AI Capstone", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "8674", "title": "Master's Project", "credits": 4 }
+                ]
+              }
+            ]
           }
         ]
       }

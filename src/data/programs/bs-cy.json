@@ -1,0 +1,251 @@
+{
+  "id": "bs-cy",
+  "name": "BS in Cybersecurity",
+  "level": "UG",
+  "totalCredits": 135,
+  "minGpa": 2.0,
+  "catalogUrl": "https://catalog.northeastern.edu/undergraduate/computer-information-science/cybersecurity/cybersecurity-bs/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
+  "requirements": {
+    "type": "allOf",
+    "label": "BS in Cybersecurity",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Computer Science Overview",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "1200", "title": "First Year Seminar", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "1210", "title": "Professional Development for Khoury Co-op", "credits": 1 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Computer Science Fundamental Courses",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "1800", "title": "Discrete Structures", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "1802", "title": "Seminar for CS 1800", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "2000", "title": "Introduction to Program Design and Implementation", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "2001", "title": "Lab for CS 2000", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "2100", "title": "Program Design and Implementation 1", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "2101", "title": "Lab for CS 2100", "credits": 1 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Computer Science Required Courses",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "3000", "title": "Algorithms and Data", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "3100", "title": "Program Design and Implementation 2", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "3101", "title": "Lab for CS 3100", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "3650", "title": "Computer Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "3800", "title": "Theory of Computation", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Networks or Distributed Systems",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "4700", "title": "Network Fundamentals", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "4730", "title": "Distributed Systems", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Presentation Requirement",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "COMM", "number": "1112", "title": "Public Speaking", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1113", "title": "Business and Professional Speaking", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1210", "title": "Persuasion and Rhetoric", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1511", "title": "Communication and Storytelling", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1125", "title": "Improvisation", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1130", "title": "Introduction to Acting", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1180", "title": "Dynamic Presence: Theatre Training for Effective Interpersonal Interactions", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "2345", "title": "Acting for the Camera", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Cybersecurity Required Courses",
+        "children": [
+          { "type": "course", "subject": "CY", "number": "2550", "title": "Foundations of Cybersecurity", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "3740", "title": "Systems Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "4740", "title": "Network Security", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Cryptography",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CY", "number": "4770", "title": "Foundations of Cryptography", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "4775", "title": "Applied Cryptography", "credits": 4 }
+            ]
+          },
+          { "type": "course", "subject": "CY", "number": "4930", "title": "Cybersecurity Capstone", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Cybersecurity and Social Issues",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "COMM", "number": "2551", "title": "Free Speech in Cyberspace", "credits": 4 },
+          { "type": "course", "subject": "CRIM", "number": "2340", "title": "Corporate Security: Securing the Private Sector", "credits": 4 },
+          { "type": "course", "subject": "CRIM", "number": "4040", "title": "Crime Prevention", "credits": 4 },
+          { "type": "course", "subject": "LPSC", "number": "1101", "title": "Introduction to Law", "credits": 4 },
+          { "type": "course", "subject": "LPSC", "number": "2301", "title": "Introduction to Law, Policy, and Society", "credits": 4 },
+          { "type": "course", "subject": "LPSC", "number": "3303", "title": "Topics in Law and Public Policy", "credits": 4 },
+          { "type": "course", "subject": "POLS", "number": "2390", "title": "Science, Technology, and Public Policy", "credits": 4 },
+          { "type": "course", "subject": "POLS", "number": "3307", "title": "Public Policy and Administration", "credits": 4 },
+          { "type": "course", "subject": "POLS", "number": "3324", "title": "Law and Society", "credits": 4 },
+          { "type": "course", "subject": "POLS", "number": "3406", "title": "International Law", "credits": 4 },
+          { "type": "course", "subject": "POLS", "number": "3420", "title": "U.S. National Security Policy", "credits": 4 },
+          { "type": "course", "subject": "POLS", "number": "3423", "title": "Terrorism and Counterterrorism", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Electrical Engineering Required Course",
+        "children": [
+          { "type": "course", "subject": "EECE", "number": "2310", "title": "Introduction to Digital Design and Computer Architecture", "credits": 4 },
+          { "type": "course", "subject": "EECE", "number": "2311", "title": "Lab for EECE 2310", "credits": 1 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Mathematics Courses",
+        "children": [
+          { "type": "course", "subject": "MATH", "number": "1341", "title": "Calculus 1 for Science and Engineering", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "1342", "title": "Calculus 2 for Science and Engineering", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "3081", "title": "Probability and Statistics", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Writing Requirements",
+        "children": [
+          { "type": "course", "subject": "ENGW", "number": "1111", "title": "First-Year Writing", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Advanced Writing in the Disciplines",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "ENGW", "number": "3302", "title": "Advanced Writing in the Technical Professions", "credits": 4 },
+              { "type": "course", "subject": "ENGW", "number": "3315", "title": "Interdisciplinary Advanced Writing in the Disciplines", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Concentration or Electives Option (concentration not required)",
+        "n": 1,
+        "children": [
+          {
+            "type": "allOf",
+            "label": "Concentration in Cyber Operations",
+            "children": [
+              { "type": "course", "subject": "CY", "number": "4760", "title": "Security of Wireless and Mobile Systems", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "5210", "title": "Information System Forensics", "credits": 4 },
+              { "type": "course", "subject": "CY", "number": "5240", "title": "Cyberlaw: Privacy, Ethics, and Digital Rights", "credits": 4 },
+              {
+                "type": "chooseN",
+                "label": "Cyber Operations electives",
+                "n": 2,
+                "children": [
+                  {
+                    "type": "chooseN",
+                    "label": "Software Engineering or Software Development",
+                    "n": 1,
+                    "children": [
+                      { "type": "course", "subject": "CS", "number": "4530", "title": "Fundamentals of Software Engineering", "credits": 4 },
+                      { "type": "course", "subject": "CS", "number": "4500", "title": "Software Development", "credits": 4 }
+                    ]
+                  },
+                  { "type": "course", "subject": "CY", "number": "5200", "title": "Security Risk Management and Assessment", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "3324", "title": "Computer Architecture and Organization", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "4534", "title": "Microprocessor-Based Design", "credits": 4 }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Electives Option",
+            "children": [
+              {
+                "type": "chooseN",
+                "label": "Law Requirement",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CY", "number": "4170", "title": "The Law, Ethics, and Policy of Data and Digital Technologies", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "5240", "title": "Cyberlaw: Privacy, Ethics, and Digital Rights", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseCredits",
+                "label": "Cybersecurity Electives (four courses)",
+                "credits": 16,
+                "children": [
+                  { "type": "course", "subject": "COMM", "number": "2551", "title": "Free Speech in Cyberspace", "credits": 4 },
+                  { "type": "course", "subject": "CRIM", "number": "2340", "title": "Corporate Security: Securing the Private Sector", "credits": 4 },
+                  { "type": "course", "subject": "CRIM", "number": "4040", "title": "Crime Prevention", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "2800", "title": "Logic and Computation", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4400", "title": "Programming Languages", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4500", "title": "Software Development", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4530", "title": "Fundamentals of Software Engineering", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4700", "title": "Network Fundamentals", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4730", "title": "Distributed Systems", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4100", "title": "AI Security and Privacy", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4770", "title": "Foundations of Cryptography", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4775", "title": "Applied Cryptography", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4760", "title": "Security of Wireless and Mobile Systems", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "5200", "title": "Security Risk Management and Assessment", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "5210", "title": "Information System Forensics", "credits": 4 },
+                  { "type": "course", "subject": "DS", "number": "4300", "title": "Large-Scale Information Storage and Retrieval", "credits": 4 },
+                  { "type": "course", "subject": "DS", "number": "4400", "title": "Machine Learning and Data Mining 1", "credits": 4 },
+                  { "type": "course", "subject": "EECE", "number": "3324", "title": "Computer Architecture and Organization", "credits": 4 },
+                  {
+                    "type": "allOf",
+                    "label": "Microprocessor-Based Design with Lab",
+                    "children": [
+                      { "type": "course", "subject": "EECE", "number": "4534", "title": "Microprocessor-Based Design", "credits": 4 },
+                      { "type": "course", "subject": "EECE", "number": "4535", "title": "Lab for EECE 4534", "credits": 1 }
+                    ]
+                  },
+                  { "type": "course", "subject": "LPSC", "number": "1101", "title": "Introduction to Law", "credits": 4 },
+                  { "type": "course", "subject": "LPSC", "number": "2301", "title": "Introduction to Law, Policy, and Society", "credits": 4 },
+                  { "type": "course", "subject": "LPSC", "number": "3303", "title": "Topics in Law and Public Policy", "credits": 4 },
+                  { "type": "course", "subject": "MATH", "number": "3527", "title": "Number Theory 1", "credits": 4 },
+                  { "type": "course", "subject": "MISM", "number": "2301", "title": "Introduction to Information Systems and Digital Technologies", "credits": 4 },
+                  { "type": "course", "subject": "POLS", "number": "2390", "title": "Science, Technology, and Public Policy", "credits": 4 },
+                  { "type": "course", "subject": "POLS", "number": "3307", "title": "Public Policy and Administration", "credits": 4 },
+                  { "type": "course", "subject": "POLS", "number": "3324", "title": "Law and Society", "credits": 4 },
+                  { "type": "course", "subject": "POLS", "number": "3406", "title": "International Law", "credits": 4 },
+                  { "type": "course", "subject": "POLS", "number": "3420", "title": "U.S. National Security Policy", "credits": 4 },
+                  { "type": "course", "subject": "POLS", "number": "3423", "title": "Terrorism and Counterterrorism", "credits": 4 }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "infoChecklist": [
+    { "id": "nupath-nd", "label": "Engaging with the Natural and Designed World (ND)" },
+    { "id": "nupath-ei", "label": "Exploring Creative Expression and Innovation (EI)" },
+    { "id": "nupath-ic", "label": "Interpreting Culture (IC)" },
+    { "id": "nupath-fq", "label": "Conducting Formal and Quantitative Reasoning (FQ)" },
+    { "id": "nupath-si", "label": "Understanding Societies and Institutions (SI)" },
+    { "id": "nupath-ad", "label": "Analyzing and Using Data (AD)" },
+    { "id": "nupath-dd", "label": "Engaging Differences and Diversity (DD)" },
+    { "id": "nupath-er", "label": "Employing Ethical Reasoning (ER)" },
+    { "id": "nupath-wf", "label": "Writing in the First Year (WF)" },
+    { "id": "nupath-wd", "label": "Advanced Writing in the Disciplines (WD)" },
+    { "id": "nupath-wi", "label": "Writing-Intensive in the Major (WI, two courses)" },
+    { "id": "nupath-ex", "label": "Integrating Knowledge and Skills Through Experience (EX)" },
+    { "id": "nupath-ce", "label": "Demonstrating Thought and Action in a Capstone (CE)" }
+  ]
+}

@@ -1,0 +1,395 @@
+{
+  "id": "bacs",
+  "name": "BA in Computer Science (BACS)",
+  "level": "UG",
+  "totalCredits": 134,
+  "minGpa": 2.0,
+  "catalogUrl": "https://catalog.northeastern.edu/undergraduate/computer-information-science/computer-science/bacs/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
+  "requirements": {
+    "type": "allOf",
+    "label": "BA in Computer Science",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Computer Science Overview",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "1200", "title": "First Year Seminar", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "1210", "title": "Professional Development for Khoury Co-op", "credits": 1 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Computer Science Fundamental Courses",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "1800", "title": "Discrete Structures", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "1802", "title": "Seminar for CS 1800", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "2000", "title": "Introduction to Program Design and Implementation", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "2001", "title": "Lab for CS 2000", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "2100", "title": "Program Design and Implementation 1", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "2101", "title": "Lab for CS 2100", "credits": 1 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Computer Science Required Courses",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "3000", "title": "Algorithms and Data", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "3100", "title": "Program Design and Implementation 2", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "3101", "title": "Lab for CS 3100", "credits": 1 },
+          { "type": "course", "subject": "CS", "number": "3650", "title": "Computer Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "3800", "title": "Theory of Computation", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Software Engineering",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "CS", "number": "4530", "title": "Fundamentals of Software Engineering", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "4535", "title": "Professional Practicum Capstone", "credits": 4 }
+            ]
+          },
+          { "type": "course", "subject": "DS", "number": "3000", "title": "Foundations of Data Science", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Security Required Course",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "CY", "number": "2550", "title": "Foundations of Cybersecurity", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "3740", "title": "Systems Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "4740", "title": "Network Security", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Presentation Requirement",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "COMM", "number": "1112", "title": "Public Speaking", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1113", "title": "Business and Professional Speaking", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1210", "title": "Persuasion and Rhetoric", "credits": 4 },
+          { "type": "course", "subject": "COMM", "number": "1511", "title": "Communication and Storytelling", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1125", "title": "Improvisation", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1130", "title": "Introduction to Acting", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "1180", "title": "Dynamic Presence: Theatre Training for Effective Interpersonal Interactions", "credits": 4 },
+          { "type": "course", "subject": "THTR", "number": "2345", "title": "Acting for the Camera", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseCredits",
+        "label": "Khoury Approved Electives",
+        "credits": 4,
+        "children": [
+          { "type": "range", "subject": "CS", "minNumber": 2500, "maxNumber": 7999, "creditsPer": 4, "label": "CS 2500 or higher (except CS 5010)" },
+          { "type": "range", "subject": "CY", "minNumber": 2000, "maxNumber": 7999, "creditsPer": 4, "label": "CY 2000 or higher (except CY 4930)" },
+          { "type": "range", "subject": "DS", "minNumber": 2500, "maxNumber": 7999, "creditsPer": 4, "label": "DS 2500 or higher (except DS 4900)" },
+          { "type": "course", "subject": "MKTG", "number": "4606", "title": "Digital, Analytics, Technology, and Automation Research Practicum", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Concentration (choose one and complete four courses)",
+        "n": 1,
+        "children": [
+          {
+            "type": "allOf",
+            "label": "Concentration in Artificial Intelligence",
+            "children": [
+              { "type": "course", "subject": "CS", "number": "4100", "title": "Artificial Intelligence", "credits": 4 },
+              { "type": "course", "subject": "DS", "number": "4400", "title": "Machine Learning and Data Mining 1", "credits": 4 },
+              {
+                "type": "chooseN",
+                "label": "AI electives (not already taken)",
+                "n": 2,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "4120", "title": "Natural Language Processing", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4150", "title": "Game Artificial Intelligence", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4180", "title": "Reinforcement Learning", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4220", "title": "Information Retrieval", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4610", "title": "Robotic Science and Systems", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4100", "title": "AI Security and Privacy", "credits": 4 },
+                  { "type": "course", "subject": "DS", "number": "4420", "title": "Machine Learning and Data Mining 2", "credits": 4 },
+                  { "type": "course", "subject": "DS", "number": "4440", "title": "Practical Neural Networks", "credits": 4 }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Concentration in Foundations",
+            "children": [
+              {
+                "type": "chooseN",
+                "label": "Logic and Computation",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "2800", "title": "Logic and Computation", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4820", "title": "Computer-Aided Reasoning", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseN",
+                "label": "Complexity or Advanced Algorithms",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "4805", "title": "Fundamentals of Complexity Theory", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4810", "title": "Advanced Algorithms", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseN",
+                "label": "Foundations electives (not already taken)",
+                "n": 2,
+                "children": [
+                  {
+                    "type": "allOf",
+                    "label": "Computer Science Research sequence",
+                    "children": [
+                      { "type": "course", "subject": "CS", "number": "3950", "title": "Introduction to Computer Science Research", "credits": 2 },
+                      { "type": "course", "subject": "CS", "number": "4950", "title": "Computer Science Research Seminar", "credits": 1 }
+                    ]
+                  },
+                  { "type": "course", "subject": "CS", "number": "4805", "title": "Fundamentals of Complexity Theory", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4810", "title": "Advanced Algorithms", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4820", "title": "Computer-Aided Reasoning", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4830", "title": "System Specification, Verification, and Synthesis", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4770", "title": "Foundations of Cryptography", "credits": 4 }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Concentration in Human-Centered Computing",
+            "children": [
+              { "type": "course", "subject": "CS", "number": "2484", "title": "Principles of Human-Computer Interaction", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "3484", "title": "GUI Programming", "credits": 4 },
+              {
+                "type": "chooseN",
+                "label": "HCC electives (not already taken)",
+                "n": 2,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "4097", "title": "Mixed Reality", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4350", "title": "Empirical Research Methods", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4520", "title": "Mobile Application Development", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4550", "title": "Web Development", "credits": 4 },
+                  { "type": "course", "subject": "DS", "number": "4200", "title": "Information Presentation and Visualization", "credits": 4 },
+                  { "type": "course", "subject": "HINF", "number": "5300", "title": "Personal Health Interface Design and Development", "credits": 4 }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Concentration in Software",
+            "children": [
+              { "type": "course", "subject": "CS", "number": "2800", "title": "Logic and Computation", "credits": 4 },
+              { "type": "course", "subject": "CS", "number": "4400", "title": "Programming Languages", "credits": 4 },
+              {
+                "type": "chooseN",
+                "label": "Networks or Distributed Systems",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "4700", "title": "Network Fundamentals", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4730", "title": "Distributed Systems", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseN",
+                "label": "Software elective (not already taken)",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "3520", "title": "Programming in C++", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4410", "title": "Compilers", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4520", "title": "Mobile Application Development", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4550", "title": "Web Development", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4700", "title": "Network Fundamentals", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4730", "title": "Distributed Systems", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4820", "title": "Computer-Aided Reasoning", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4830", "title": "System Specification, Verification, and Synthesis", "credits": 4 }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Concentration in Systems",
+            "children": [
+              {
+                "type": "chooseN",
+                "label": "Networks or Distributed Systems",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "4700", "title": "Network Fundamentals", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4730", "title": "Distributed Systems", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseN",
+                "label": "Security course (not already taken)",
+                "n": 1,
+                "children": [
+                  { "type": "course", "subject": "CY", "number": "3740", "title": "Systems Security", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4740", "title": "Network Security", "credits": 4 }
+                ]
+              },
+              {
+                "type": "chooseN",
+                "label": "Systems electives (not already taken)",
+                "n": 2,
+                "children": [
+                  { "type": "course", "subject": "CS", "number": "3520", "title": "Programming in C++", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4300", "title": "Computer Graphics", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4360", "title": "Non-Interactive Computer Graphics", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4610", "title": "Robotic Science and Systems", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4700", "title": "Network Fundamentals", "credits": 4 },
+                  { "type": "course", "subject": "CS", "number": "4730", "title": "Distributed Systems", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "3740", "title": "Systems Security", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4740", "title": "Network Security", "credits": 4 },
+                  { "type": "course", "subject": "CY", "number": "4760", "title": "Security of Wireless and Mobile Systems", "credits": 4 }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Mathematics Courses",
+        "children": [
+          { "type": "course", "subject": "MATH", "number": "1341", "title": "Calculus 1 for Science and Engineering", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Mathematical Reasoning",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "MATH", "number": "1365", "title": "Introduction to Mathematical Reasoning", "credits": 4 },
+              { "type": "course", "subject": "MATH", "number": "1465", "title": "Intensive Mathematical Reasoning", "credits": 4 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Science Course (one course with required labs)",
+        "n": 1,
+        "children": [
+          {
+            "type": "allOf",
+            "label": "General Biology 1",
+            "children": [
+              { "type": "course", "subject": "BIOL", "number": "1111", "title": "General Biology 1", "credits": 4 },
+              { "type": "course", "subject": "BIOL", "number": "1112", "title": "Lab for BIOL 1111", "credits": 1 }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "General Chemistry for Science Majors",
+            "children": [
+              { "type": "course", "subject": "CHEM", "number": "1161", "title": "General Chemistry for Science Majors", "credits": 4 },
+              { "type": "course", "subject": "CHEM", "number": "1162", "title": "Lab for CHEM 1161", "credits": 1 }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "General Chemistry 1",
+            "children": [
+              { "type": "course", "subject": "CHEM", "number": "1211", "title": "General Chemistry 1", "credits": 4 },
+              { "type": "course", "subject": "CHEM", "number": "1212", "title": "Lab for CHEM 1211", "credits": 1 },
+              { "type": "course", "subject": "CHEM", "number": "1213", "title": "Recitation for CHEM 1211", "credits": 0 }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Dynamic Earth",
+            "children": [
+              { "type": "course", "subject": "ENVR", "number": "1200", "title": "Dynamic Earth", "credits": 4 },
+              { "type": "course", "subject": "ENVR", "number": "1201", "title": "Lab for ENVR 1200", "credits": 1 }
+            ]
+          },
+          { "type": "course", "subject": "MATH", "number": "1342", "title": "Calculus 2 for Science and Engineering", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "2280", "title": "Statistics and Software", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "2331", "title": "Linear Algebra", "credits": 4 },
+          { "type": "course", "subject": "MATH", "number": "3081", "title": "Probability and Statistics", "credits": 4 },
+          {
+            "type": "allOf",
+            "label": "Physics for Life Sciences 1",
+            "children": [
+              { "type": "course", "subject": "PHYS", "number": "1145", "title": "Physics for Life Sciences 1", "credits": 4 },
+              { "type": "course", "subject": "PHYS", "number": "1146", "title": "Lab for PHYS 1145", "credits": 1 }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Physics for Engineering 1",
+            "children": [
+              { "type": "course", "subject": "PHYS", "number": "1151", "title": "Physics for Engineering 1", "credits": 3 },
+              { "type": "course", "subject": "PHYS", "number": "1152", "title": "Lab for PHYS 1151", "credits": 1 },
+              { "type": "course", "subject": "PHYS", "number": "1153", "title": "Interactive Learning Seminar for PHYS 1151", "credits": 1 }
+            ]
+          },
+          {
+            "type": "allOf",
+            "label": "Physics 1",
+            "children": [
+              { "type": "course", "subject": "PHYS", "number": "1161", "title": "Physics 1", "credits": 4 },
+              { "type": "course", "subject": "PHYS", "number": "1162", "title": "Lab for PHYS 1161", "credits": 1 }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "chooseN",
+        "label": "Computing and Social Issues",
+        "n": 1,
+        "children": [
+          { "type": "course", "subject": "AFCS", "number": "2600", "title": "Issues in Race, Science, and Technology", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "4170", "title": "The Law, Ethics, and Policy of Data and Digital Technologies", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5240", "title": "Cyberlaw: Privacy, Ethics, and Digital Rights", "credits": 4 },
+          { "type": "course", "subject": "DS", "number": "1300", "title": "Knowledge in a Digital World", "credits": 4 },
+          { "type": "course", "subject": "PHIL", "number": "1300", "title": "Knowledge in a Digital World", "credits": 4 },
+          { "type": "course", "subject": "HIST", "number": "2220", "title": "History of Technology", "credits": 4 },
+          { "type": "course", "subject": "INSH", "number": "2102", "title": "Bostonography: The City through Data, Texts, Maps, and Networks", "credits": 4 },
+          { "type": "course", "subject": "JRNL", "number": "3700", "title": "Data Storytelling", "credits": 4 },
+          { "type": "course", "subject": "PHIL", "number": "1145", "title": "Technology and Human Values", "credits": 4 },
+          { "type": "course", "subject": "SOCL", "number": "1280", "title": "The Twenty-First-Century Workplace", "credits": 4 },
+          { "type": "course", "subject": "SOCL", "number": "2485", "title": "Environment, Technology, and Society", "credits": 4 },
+          { "type": "course", "subject": "SOCL", "number": "4528", "title": "Technology and Society", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Writing Requirements",
+        "children": [
+          { "type": "course", "subject": "ENGW", "number": "1111", "title": "First-Year Writing", "credits": 4 },
+          {
+            "type": "chooseN",
+            "label": "Advanced Writing in the Disciplines",
+            "n": 1,
+            "children": [
+              { "type": "course", "subject": "ENGW", "number": "3302", "title": "Advanced Writing in the Technical Professions", "credits": 4 },
+              { "type": "course", "subject": "ENGW", "number": "3315", "title": "Interdisciplinary Advanced Writing in the Disciplines", "credits": 4 }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "infoChecklist": [
+    { "id": "nupath-nd", "label": "Engaging with the Natural and Designed World (ND)" },
+    { "id": "nupath-ei", "label": "Exploring Creative Expression and Innovation (EI)" },
+    { "id": "nupath-ic", "label": "Interpreting Culture (IC)" },
+    { "id": "nupath-fq", "label": "Conducting Formal and Quantitative Reasoning (FQ)" },
+    { "id": "nupath-si", "label": "Understanding Societies and Institutions (SI)" },
+    { "id": "nupath-ad", "label": "Analyzing and Using Data (AD)" },
+    { "id": "nupath-dd", "label": "Engaging Differences and Diversity (DD)" },
+    { "id": "nupath-er", "label": "Employing Ethical Reasoning (ER)" },
+    { "id": "nupath-wf", "label": "Writing in the First Year (WF)" },
+    { "id": "nupath-wd", "label": "Advanced Writing in the Disciplines (WD)" },
+    { "id": "nupath-wi", "label": "Writing-Intensive in the Major (WI, two courses)" },
+    { "id": "nupath-ex", "label": "Integrating Knowledge and Skills Through Experience (EX)" },
+    { "id": "nupath-ce", "label": "Demonstrating Thought and Action in a Capstone (CE)" }
+  ]
+}

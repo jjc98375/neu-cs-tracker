@@ -1,0 +1,88 @@
+{
+  "id": "ms-cy",
+  "name": "MS Cybersecurity",
+  "level": "MS",
+  "totalCredits": 32,
+  "minGpa": 3.0,
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/cybersecurity/cybersecurity-ms/",
+  "catalogYear": "2025-2026",
+  "verifiedAt": "2026-07-18",
+  "requirements": {
+    "type": "allOf",
+    "label": "MS in Cybersecurity",
+    "children": [
+      {
+        "type": "allOf",
+        "label": "Core: Foundations",
+        "children": [
+          { "type": "course", "subject": "CY", "number": "5001", "title": "Cybersecurity: Technologies, Threats, and Defenses", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5010", "title": "Cybersecurity Principles and Practices", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseCredits",
+        "label": "Technical Track",
+        "credits": 8,
+        "children": [
+          { "type": "course", "subject": "CY", "number": "5120", "title": "Applied Cryptography", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5130", "title": "Computer System Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5150", "title": "Network Security Practices", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5770", "title": "Software Vulnerabilities and Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6120", "title": "Software Security Practices", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6740", "title": "Network Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6760", "title": "Wireless and Mobile Systems Security", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseCredits",
+        "label": "Contextual Track",
+        "credits": 8,
+        "children": [
+          { "type": "course", "subject": "CY", "number": "5200", "title": "Security Risk Management and Assessment", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5210", "title": "Information System Forensics", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5240", "title": "Cyberlaw: Privacy, Ethics, and Digital Rights", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5250", "title": "Decision Making for Critical Infrastructure", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6200", "title": "Special Topics in IT Security Governance, Risk, and Compliance", "credits": 4 }
+        ]
+      },
+      {
+        "type": "allOf",
+        "label": "Capstone",
+        "children": [
+          { "type": "course", "subject": "CY", "number": "7900", "title": "Capstone Project", "credits": 4 }
+        ]
+      },
+      {
+        "type": "chooseCredits",
+        "label": "Electives",
+        "credits": 4,
+        "children": [
+          { "type": "course", "subject": "CRIM", "number": "6200", "title": "Criminology", "credits": 4 },
+          { "type": "course", "subject": "CRIM", "number": "6202", "title": "The Criminal Justice Process", "credits": 4 },
+          { "type": "course", "subject": "CRIM", "number": "6262", "title": "Evidence-Based Crime Policy", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5200", "title": "Database Management Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5500", "title": "Foundations of Software Engineering", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5600", "title": "Computer Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5610", "title": "Web Development", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5700", "title": "Fundamentals of Computer Networking", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7580", "title": "Special Topics in Software Engineering", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "7805", "title": "Complexity Theory", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5065", "title": "Cloud Security Practices", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5120", "title": "Applied Cryptography", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5130", "title": "Computer System Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5150", "title": "Network Security Practices", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5200", "title": "Security Risk Management and Assessment", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5210", "title": "Information System Forensics", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5240", "title": "Cyberlaw: Privacy, Ethics, and Digital Rights", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "5770", "title": "Software Vulnerabilities and Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6200", "title": "Special Topics in IT Security Governance, Risk, and Compliance", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6740", "title": "Network Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "6760", "title": "Wireless and Mobile Systems Security", "credits": 4 },
+          { "type": "course", "subject": "CY", "number": "7790", "title": "Special Topics in Security and Privacy", "credits": 4 },
+          { "type": "course", "subject": "POLS", "number": "7341", "title": "Security and Resilience Policy", "credits": 4 },
+          { "type": "course", "subject": "PPUA", "number": "6503", "title": "Managing People in Public and Nonprofit Sectors", "credits": 4 }
+        ]
+      }
+    ]
+  }
+}

@@ -1,22 +1,33 @@
 {
-  "id": "mscs",
-  "name": "MS Computer Science (MSCS)",
+  "id": "mscs-align",
+  "name": "Align MS Computer Science (MSCS)",
   "level": "MS",
-  "totalCredits": 32,
+  "totalCredits": 44,
   "minGpa": 3.0,
-  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/computer-science/computer-science-mscs/",
+  "catalogUrl": "https://catalog.northeastern.edu/graduate/computer-information-science/computer-science/computer-science-mscs-align/",
   "catalogYear": "2025-2026",
   "verifiedAt": "2026-07-18",
   "requirements": {
     "type": "allOf",
-    "label": "MS in Computer Science",
+    "label": "Align MS in Computer Science (36-44 SH; bridge coursework may be reduced by placement)",
     "children": [
+      {
+        "type": "allOf",
+        "label": "Align Bridge Coursework",
+        "children": [
+          { "type": "course", "subject": "CS", "number": "5001", "title": "Intensive Foundations of Computer Science", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5003", "title": "Recitation for CS 5001", "credits": 0 },
+          { "type": "course", "subject": "CS", "number": "5002", "title": "Discrete Structures", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5004", "title": "Object-Oriented Design", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5005", "title": "Recitation for CS 5004", "credits": 0 },
+          { "type": "course", "subject": "CS", "number": "5008", "title": "Data Structures, Algorithms, and Their Applications within Computer Systems", "credits": 4 },
+          { "type": "course", "subject": "CS", "number": "5009", "title": "Recitation for CS 5008", "credits": 0 }
+        ]
+      },
       {
         "type": "allOf",
         "label": "Core Requirements",
         "children": [
-          { "type": "course", "subject": "CS", "number": "5010", "title": "Programming Design Paradigm", "credits": 4 },
-          { "type": "course", "subject": "CS", "number": "5011", "title": "Recitation for CS 5010", "credits": 0 },
           { "type": "course", "subject": "CS", "number": "5800", "title": "Algorithms", "credits": 4 }
         ]
       },
