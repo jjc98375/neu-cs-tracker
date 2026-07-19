@@ -63,9 +63,10 @@ export function deriveSummerSession(
   if (suffix === "40") return "Summer1";
   if (suffix === "60") return "Summer2";
   if (suffix === "50") {
-    // Section-level split via partOfTerm
-    if (partOfTerm === "A") return "Summer1";
-    if (partOfTerm === "B") return "Summer2";
+    // Section-level split via partOfTerm. Banner uses both bare ("A"/"B") and
+    // prefixed ("2A"/"2B") codes for the summer half-sessions.
+    if (partOfTerm.endsWith("A")) return "Summer1";
+    if (partOfTerm.endsWith("B")) return "Summer2";
     // Fallback: use meeting time date ranges to detect session
     if (meetingTimes && meetingTimes.length > 0) {
       const inferred = inferSessionFromDates(meetingTimes);

@@ -68,6 +68,11 @@ describe("deriveSummerSession", () => {
     expect(deriveSummerSession("202450", "B")).toBe("Summer2");
   });
 
+  it("handles prefixed partOfTerm codes 2A/2B (live Banner values, e.g. Summer 2026)", () => {
+    expect(deriveSummerSession("202650", "2A")).toBe("Summer1");
+    expect(deriveSummerSession("202650", "2B")).toBe("Summer2");
+  });
+
   it("returns Full for suffix 50 with partOfTerm 1", () => {
     expect(deriveSummerSession("202450", "1")).toBe("Full");
   });
